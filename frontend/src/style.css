@@ -1,0 +1,138 @@
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: #020617;
+  color: white;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #020617, #020617);
+  padding: 20px;
+  border-right: 1px solid #0f172a;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.logo img {
+  width: 40px;
+}
+
+.logo h2 {
+  margin: 0;
+  color: #38bdf8;
+}
+
+/* FORM */
+.sidebar label {
+  display: block;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.sidebar select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background: #0f172a;
+  color: white;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+}
+
+/* LOGS */
+.logs-title {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #38bdf8;
+}
+
+.log-item {
+  font-size: 10px;
+  margin-top: 8px;
+  opacity: 0.6;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 15px;
+  border-bottom: 1px solid #0f172a;
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+/* CHAT */
+.chat {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+/* USER */
+.user {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  align-self: flex-end;
+  color: black;
+}
+
+/* BOT */
+.bot {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: black;
+}
+
+/* INPUT */
+.input-area {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #0f172a;
+  background: #020617;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: white;
+  border-radius: 8px;
+}
+
+button {
+  margin-left: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+}
