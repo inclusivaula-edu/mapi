@@ -1,20 +1,15 @@
 import { login, register, supabase, getSession, logout } from "./auth.js";
-import { getHistory } from "./api.js";
 import { renderLayout, addMessage, updateLastMessage } from "./ui.js";
 import { state } from "./state.js";
 
 renderLayout();
 
 // ==============================
-// 🔐 TOKEN AUTO
-// ==============================
 async function getAccessToken() {
   const { data } = await supabase.auth.getSession();
   return data.session?.access_token;
 }
 
-// ==============================
-// 🧠 USER CONTEXT
 // ==============================
 async function getUserContext() {
   const { data } = await supabase.auth.getUser();
@@ -36,103 +31,54 @@ async function getUserContext() {
 }
 
 // ==============================
-// 🔐 PROTEÇÃO
-// ==============================
 async function protectRoute() {
   const session = await getSession();
 
-  const authDiv = document.getElementById("auth");
-  const appDiv = document.getElementById("app");
+  document.getElementById("auth").style.display = session ? "none" : "block";
+  document.getElementById("app").style.display = session ? "block" : "none";
 
-  if (!session) {
-    authDiv.style.display = "block";
-    appDiv.style.display = "none";
-  } else {
-    authDiv.style.display = "none";
-    appDiv.style.display = "block";
-
-    await getUserContext();
-  }
+  if (session) await getUserContext();
 }
 
 await protectRoute();
 
 // ==============================
-// 🚀 STREAM
+// 💳 ASSINATURA REAL
 // ==============================
-async function sendStream() {
-  const inputEl = document.getElementById("input");
-  const text = inputEl.value;
+document
+  .getElementById("form-checkout")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  if (!text) return;
+    const token = await getAccessToken();
 
-  addMessage(text, "user");
-  inputEl.value = "";
+    // ⚠️ Aqui você deve integrar MercadoPago.js para gerar o cardToken real
+    const fakeCardToken = "TEST_TOKEN";
 
-  const token = await getAccessToken();
-
-  const res = await fetch("http://localhost:3000/stream", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
-      input: text,
-      module: "education",
-      chatId: state.chatId || "default",
-    }),
-  });
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-
-  let botMsg = "";
-  addMessage("", "bot");
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-
-    chunk.split("\n").forEach((line) => {
-      if (line.startsWith("data: ")) {
-        const data = line.replace("data: ", "");
-
-        if (data === "[DONE]") return;
-
-        botMsg += data;
-        updateLastMessage(botMsg);
-      }
+    const res = await fetch("http://localhost:3000/create-subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        plan: "pro",
+        email: "cliente@email.com",
+        cardToken: fakeCardToken,
+      }),
     });
-  }
-}
 
-// ==============================
-// 💰 PAGAMENTO
-// ==============================
-export async function pagarPlano(plan) {
-  const token = await getAccessToken();
+    const data = await res.json();
 
-  const res = await fetch("http://localhost:3000/create-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({
-      tenantId: state.tenantId,
-      plan,
-    }),
+    if (data.success) {
+      alert("🔥 Assinatura ativada!");
+    } else {
+      alert("Erro ao assinar");
+    }
   });
 
-  const data = await res.json();
-  window.location.href = data.url;
-}
-
 // ==============================
-// 🔐 AUTH
+// AUTH
 // ==============================
 document.getElementById("loginBtn")?.addEventListener("click", async () => {
   const email = document.getElementById("email").value;
@@ -154,20 +100,3 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
   await logout();
   location.reload();
 });
-
-async function pagarPlano(plan) {
-  const token = await getAccessToken();
-
-  const res = await fetch("http://localhost:3000/create-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token
-    },
-    body: JSON.stringify({ plan })
-  });
-
-  const data = await res.json();
-
-  window.location.href = data.url;
-}

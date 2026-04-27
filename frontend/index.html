@@ -1,28 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <title>MAPI Framework Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAPI Dashboard</title>
   </head>
 
   <body>
-    <!-- 🔐 AUTH -->
-    <div id="auth">
-      <input id="email" placeholder="Email" />
-      <input id="password" type="password" placeholder="Senha" />
-      <button id="loginBtn">Entrar</button>
-      <button id="registerBtn">Criar conta</button>
-    </div>
+    <div id="root"></div>
 
-    <!-- 🚀 APP -->
-    <div id="app" style="display: none;">
-      <div id="chat"></div>
-      <input id="input" placeholder="Digite sua mensagem..." />
-      <button id="send">Enviar</button>
-      <button id="logoutBtn">Sair</button>
-    </div>
+    <h2>Assinar Plano</h2>
 
-    <!-- JS -->
-    <script type="module" src="/src/main.js"></script>
+    <form id="form-checkout">
+      <input id="cardholderName" placeholder="Nome" required />
+      <input id="cardNumber" placeholder="Número do cartão" required />
+      <input id="expirationDate" placeholder="MM/YY" required />
+      <input id="securityCode" placeholder="CVV" required />
+
+      <button type="submit">Assinar</button>
+    </form>
+
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
