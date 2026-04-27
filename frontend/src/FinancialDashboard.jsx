@@ -21,7 +21,6 @@ export default function FinancialDashboard() {
   useEffect(() => {
     loadFinancials();
 
-    // 🔥 tempo real
     const channel = supabase
       .channel("realtime-finance")
       .on(
@@ -31,21 +30,16 @@ export default function FinancialDashboard() {
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => supabase.removeChannel(channel);
   }, []);
 
   async function loadFinancials() {
-    const { data: subs } = await supabase
+    const { data: subs, error } = await supabase
       .from("subscriptions")
       .select("*");
 
-    if (!subs) return;
+    if (error || !subs) return;
 
-    // =====================
-    // 💰 MRR
-    // =====================
     const prices = {
       basic: 29.9,
       pro: 59.9,
@@ -61,9 +55,6 @@ export default function FinancialDashboard() {
 
     setMrr(totalMRR);
 
-    // =====================
-    // ❌ CHURN
-    // =====================
     const inactive = subs.filter((s) => s.status !== "active").length;
 
     const churnRate =
@@ -71,9 +62,6 @@ export default function FinancialDashboard() {
 
     setChurn(churnRate);
 
-    // =====================
-    // 📊 POR PLANO
-    // =====================
     const grouped = {};
 
     subs.forEach((s) => {
@@ -88,9 +76,6 @@ export default function FinancialDashboard() {
 
     setPlans(planData);
 
-    // =====================
-    // 📈 HISTÓRICO (FAKE REALTIME)
-    // =====================
     const chartData = activeSubs.map((s, i) => ({
       name: `Sub ${i + 1}`,
       revenue: prices[s.plan] || 0,
@@ -103,11 +88,10 @@ export default function FinancialDashboard() {
     <div style={{ padding: 30 }}>
       <h1>🔥 Financial Dashboard</h1>
 
-      {/* ================= KPI ================= */}
       <div style={{ display: "flex", gap: 20, marginBottom: 30 }}>
         <div className="card">
           <h3>MRR</h3>
-          <h2>R$ {mrr}</h2>
+          <h2>R$ {mrr.toFixed(2)}</h2>
         </div>
 
         <div className="card">
@@ -116,7 +100,6 @@ export default function FinancialDashboard() {
         </div>
       </div>
 
-      {/* ================= GRÁFICO RECEITA ================= */}
       <h3>Receita por Assinatura</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
@@ -127,7 +110,6 @@ export default function FinancialDashboard() {
         </LineChart>
       </ResponsiveContainer>
 
-      {/* ================= PLANOS ================= */}
       <h3 style={{ marginTop: 40 }}>Distribuição de Planos</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={plans}>
