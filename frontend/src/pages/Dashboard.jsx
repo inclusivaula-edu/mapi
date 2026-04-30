@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../auth";
 
+
 export default function Dashboard() {
   const [stats, setStats] = useState({
     users: 0,

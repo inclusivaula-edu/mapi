@@ -13,10 +13,13 @@ import {
 } from "recharts";
 
 export default function FinancialDashboard() {
-  const [data, setData] = useState([]);
   const [mrr, setMrr] = useState(0);
+  const [growth, setGrowth] = useState(0);
   const [churn, setChurn] = useState(0);
+  const [ltv, setLtv] = useState(0);
+  const [risk, setRisk] = useState(0);
   const [plans, setPlans] = useState([]);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     loadFinancials();
@@ -34,11 +37,10 @@ export default function FinancialDashboard() {
   }, []);
 
   async function loadFinancials() {
-    const { data: subs, error } = await supabase
-      .from("subscriptions")
-      .select("*");
+    const { data: subs } = await supabase.from("subscriptions").select("*");
+    const { data: invoices } = await supabase.from("invoices").select("*");
 
-    if (error || !subs) return;
+    if (!subs) return;
 
     const prices = {
       basic: 29.9,
@@ -46,6 +48,9 @@ export default function FinancialDashboard() {
       enterprise: 99.9,
     };
 
+    // ======================
+    // 💰 MRR
+    // ======================
     const activeSubs = subs.filter((s) => s.status === "active");
 
     const totalMRR = activeSubs.reduce(
@@ -55,13 +60,51 @@ export default function FinancialDashboard() {
 
     setMrr(totalMRR);
 
-    const inactive = subs.filter((s) => s.status !== "active").length;
+    // ======================
+    // 📉 CHURN
+    // ======================
+    const canceled = subs.filter((s) => s.status !== "active").length;
 
     const churnRate =
-      subs.length > 0 ? ((inactive / subs.length) * 100).toFixed(2) : 0;
+      subs.length > 0 ? (canceled / subs.length) * 100 : 0;
 
-    setChurn(churnRate);
+    setChurn(churnRate.toFixed(2));
 
+    // ======================
+    // 💎 LTV
+    // ======================
+    const avgTicket =
+      activeSubs.length > 0 ? totalMRR / activeSubs.length : 0;
+
+    const churnDecimal = churnRate / 100;
+
+    const ltvValue =
+      churnDecimal > 0 ? avgTicket / churnDecimal : avgTicket;
+
+    setLtv(ltvValue.toFixed(2));
+
+    // ======================
+    // 📈 GROWTH (simples)
+    // ======================
+    const lastMRR = history.length > 0 ? history[history.length - 1].mrr : 0;
+
+    const growthRate =
+      lastMRR > 0 ? ((totalMRR - lastMRR) / lastMRR) * 100 : 0;
+
+    setGrowth(growthRate.toFixed(2));
+
+    // ======================
+    // ⚠️ RECEITA EM RISCO
+    // ======================
+    const riskValue = invoices
+      ?.filter((i) => i.status !== "paid")
+      .reduce((acc, i) => acc + (i.amount || 0), 0);
+
+    setRisk(riskValue || 0);
+
+    // ======================
+    // 📊 PLANOS
+    // ======================
     const grouped = {};
 
     subs.forEach((s) => {
@@ -76,40 +119,45 @@ export default function FinancialDashboard() {
 
     setPlans(planData);
 
-    const chartData = activeSubs.map((s, i) => ({
-      name: `Sub ${i + 1}`,
-      revenue: prices[s.plan] || 0,
-    }));
+    // ======================
+    // 📈 HISTÓRICO SIMPLES
+    // ======================
+    const newHistory = [
+      ...history,
+      {
+        name: new Date().toLocaleTimeString(),
+        mrr: totalMRR,
+      },
+    ];
 
-    setData(chartData);
+    setHistory(newHistory.slice(-10)); // últimos 10 pontos
   }
 
   return (
     <div style={{ padding: 30 }}>
-      <h1>🔥 Financial Dashboard</h1>
+      <h1>🔥 Stripe-Level Dashboard</h1>
 
-      <div style={{ display: "flex", gap: 20, marginBottom: 30 }}>
-        <div className="card">
-          <h3>MRR</h3>
-          <h2>R$ {mrr.toFixed(2)}</h2>
-        </div>
-
-        <div className="card">
-          <h3>Churn</h3>
-          <h2>{churn}%</h2>
-        </div>
+      {/* ================= KPI ================= */}
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        <Card title="MRR" value={`R$ ${mrr}`} />
+        <Card title="Growth" value={`${growth}%`} />
+        <Card title="Churn" value={`${churn}%`} />
+        <Card title="LTV" value={`R$ ${ltv}`} />
+        <Card title="Em Risco" value={`R$ ${risk}`} />
       </div>
 
-      <h3>Receita por Assinatura</h3>
+      {/* ================= MRR HISTÓRICO ================= */}
+      <h3 style={{ marginTop: 40 }}>MRR em Tempo Real</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <LineChart data={history}>
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="revenue" />
+          <Line type="monotone" dataKey="mrr" />
         </LineChart>
       </ResponsiveContainer>
 
+      {/* ================= PLANOS ================= */}
       <h3 style={{ marginTop: 40 }}>Distribuição de Planos</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={plans}>
@@ -120,6 +168,24 @@ export default function FinancialDashboard() {
           <Bar dataKey="total" />
         </BarChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ================= COMPONENTE CARD =================
+function Card({ title, value }) {
+  return (
+    <div
+      style={{
+        background: "#111",
+        color: "#fff",
+        padding: 20,
+        borderRadius: 12,
+        minWidth: 150,
+      }}
+    >
+      <h4>{title}</h4>
+      <h2>{value}</h2>
     </div>
   );
 }
