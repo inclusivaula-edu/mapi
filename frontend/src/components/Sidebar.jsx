@@ -1,16 +1,56 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
-  return (
-    <div className="w-64 h-screen bg-gray-900 text-white p-5">
-      <h1 className="text-xl font-bold mb-10">MAPI</h1>
+  const location = useLocation();
 
-      <nav className="flex flex-col gap-4">
-        <Link to="/">Dashboard</Link>
-        <Link to="/lessons">Aulas</Link>
-        <Link to="/reports">Relatórios</Link>
-        <Link to="/billing">Billing</Link>
-      </nav>
+  const menu = [
+    { name: "Dashboard", path: "/" },
+    { name: "Financeiro", path: "/finance" },
+    { name: "Billing", path: "/billing" },
+    { name: "Modules", path: "/modules" }
+  ];
+
+  return (
+    <div style={styles.sidebar}>
+      <h2 style={styles.logo}>🔥 MAPI</h2>
+
+      {menu.map((item) => {
+        const active = location.pathname === item.path;
+
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            style={{
+              ...styles.link,
+              background: active ? "#1e293b" : "transparent",
+            }}
+          >
+            {item.name}
+          </Link>
+        );
+      })}
     </div>
   );
 }
+
+const styles = {
+  sidebar: {
+    width: 240,
+    height: "100vh",
+    background: "#0f172a",
+    color: "#fff",
+    padding: 20,
+  },
+  logo: {
+    marginBottom: 30,
+  },
+  link: {
+    display: "block",
+    padding: 12,
+    borderRadius: 8,
+    color: "#fff",
+    textDecoration: "none",
+    marginBottom: 8,
+  },
+};

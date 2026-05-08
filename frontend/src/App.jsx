@@ -1,28 +1,28 @@
-import './App.css'
-import BillingDashboard from "./BillingDashboard";
-import FinancialDashboard from "./FinancialDashboard";
-import { useState } from "react";
+import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./pages/Dashboard";
+import Billing from "./pages/Billing";
+import FinancialDashboard from "./pages/FinancialDashboard";
+import Modules from "./pages/Modules";
 
 function App() {
-  const [view, setView] = useState("financial");
-
   return (
-    <div>
-      {/* 🔥 NAVBAR SIMPLES */}
-      <div style={{ display: "flex", gap: 10, padding: 20 }}>
-        <button onClick={() => setView("billing")}>
-          Billing
-        </button>
+    <BrowserRouter>
+      <div style={{ display: "flex" }}>
+        <Sidebar />
 
-        <button onClick={() => setView("financial")}>
-          Financial
-        </button>
+        <div style={{ flex: 1, padding: 20 }}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/modules" element={<Modules />} /> 🔥
+          </Routes>
+        </div>
       </div>
-
-      {/* 🔥 DASHBOARD */}
-      {view === "billing" && <BillingDashboard />}
-      {view === "financial" && <FinancialDashboard />}
-    </div>
+    </BrowserRouter>
   );
 }
 
