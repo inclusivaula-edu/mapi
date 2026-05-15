@@ -1,85 +1,130 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../auth";
+import { useState } from "react";
+import { getToken } from "../services/auth";
+import { useUsage } from "../hooks/useUsage";
+import UpgradeModal from "../components/UpgradeModal";
+
+const API_URL = "http://localhost:3000";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    users: 0,
-    subscriptions: 0,
-    revenue: 0,
-  });
+  const [loadingBasic, setLoadingBasic] = useState(false);
+  const [loadingAdvanced, setLoadingAdvanced] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const { usage, reload } = useUsage();
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+  async function callAI(endpoint, setLoading) {
+    setError(null);
 
-  async function loadStats() {
     try {
-      const { data: users } = await supabase
-        .from("user_tenants")
-        .select("*");
+      setLoading(true);
 
-      const { data: subs } = await supabase
-        .from("subscriptions")
-        .select("*");
+      const token = await getToken();
 
-      const prices = {
-        basic: 29.9,
-        pro: 59.9,
-        enterprise: 99.9,
-      };
-
-      const revenue =
-        (subs || []).reduce((acc, s) => {
-          if (s.status === "active") {
-            return acc + (prices[s.plan] || 0);
-          }
-          return acc;
-        }, 0) || 0;
-
-      setStats({
-        users: users?.length || 0,
-        subscriptions: subs?.length || 0,
-        revenue,
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
+
+      const data = await res.json();
+
+      // 💳 bloqueio de billing (Stripe-style)
+      if (res.status === 402 || res.status === 403) {
+        setShowUpgrade(true);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data?.error || "Erro inesperado");
+        return;
+      }
+
+      console.log("AI Response:", data);
+
+      reload();
     } catch (err) {
-      console.error("Erro ao carregar stats:", err);
+      console.error("Erro:", err);
+      setError("Falha de conexão com servidor");
     } finally {
       setLoading(false);
     }
   }
 
-  if (loading) return <p>Carregando...</p>;
+  async function handleUpgrade() {
+    try {
+      const token = await getToken();
+
+      const res = await fetch(`${API_URL}/create-subscription`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: usage?.email || "",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data?.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        setError("Falha ao gerar checkout");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao iniciar assinatura");
+    }
+  }
 
   return (
-    <div>
-      <h1>📊 Dashboard</h1>
+    <div className="p-6 max-w-3xl mx-auto">
+      {/* HEADER */}
+      <h1 className="text-2xl font-bold mb-2">🤖 IA Dashboard</h1>
 
-      <div style={{ display: "flex", gap: 20 }}>
-        <Card title="Usuários" value={stats.users} />
-        <Card title="Assinaturas" value={stats.subscriptions} />
-        <Card title="MRR" value={`R$ ${stats.revenue}`} />
+      {/* STATUS PLAN */}
+      {usage && (
+        <div className="mb-6 text-sm text-gray-600">
+          Plano: <b>{usage.plan}</b> | Uso: {usage.usage} / {usage.limit}
+        </div>
+      )}
+
+      {/* ERROR */}
+      {error && (
+        <div className="mb-4 text-red-600 text-sm">
+          ⚠ {error}
+        </div>
+      )}
+
+      {/* BUTTONS */}
+      <div className="flex gap-4">
+        <button
+          onClick={() => callAI("/ai/basic", setLoadingBasic)}
+          disabled={loadingBasic}
+          className="bg-gray-800 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {loadingBasic ? "Carregando..." : "IA Básica"}
+        </button>
+
+        <button
+          onClick={() => callAI("/ai/advanced", setLoadingAdvanced)}
+          disabled={loadingAdvanced}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {loadingAdvanced ? "Carregando..." : "IA Avançada (PRO)"}
+        </button>
       </div>
+
+      {/* MODAL UPGRADE */}
+      <UpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        onUpgrade={handleUpgrade}
+      />
     </div>
   );
 }
-
-function Card({ title, value }) {
-  return (
-    <div style={styles.card}>
-      <h3>{title}</h3>
-      <h2>{value}</h2>
-    </div>
-  );
-}
-
-const styles = {
-  card: {
-    background: "#111",
-    color: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    minWidth: 200,
-  },
-};

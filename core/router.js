@@ -1,24 +1,27 @@
 let openai = null;
 
-// só ativa se tiver API KEY
 if (process.env.OPENAI_API_KEY) {
   const OpenAI = (await import("openai")).default;
 
   openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
   });
 }
 
+// ===============================
+// 🧠 ROUTER IA LIMPO
+// ===============================
 export async function routeTask(input) {
   try {
     if (!input || typeof input !== "string") {
       return "assistant";
     }
 
+    const text = input.toLowerCase();
+
     // fallback sem OpenAI
     if (!openai) {
-      if (input.toLowerCase().includes("aula")) return "teacher";
-      return "assistant";
+      return text.includes("aula") ? "teacher" : "assistant";
     }
 
     const completion = await openai.chat.completions.create({
@@ -26,23 +29,23 @@ export async function routeTask(input) {
       messages: [
         {
           role: "system",
-          content: "Escolha apenas: teacher ou assistant"
+          content: "Classifique apenas: teacher ou assistant",
         },
         {
           role: "user",
-          content: input
-        }
-      ]
+          content: input,
+        },
+      ],
     });
 
-    const content = completion.choices?.[0]?.message?.content;
+    const result = completion.choices?.[0]?.message?.content;
 
-    return content?.trim().toLowerCase() || "assistant";
-
+    return result?.trim().toLowerCase() || "assistant";
   } catch (error) {
-    console.log("⚠️ fallback ativado:", error.message);
+    console.log("⚠️ fallback:", error.message);
 
-    if (input.toLowerCase().includes("aula")) return "teacher";
-    return "assistant";
+    return input?.toLowerCase().includes("aula")
+      ? "teacher"
+      : "assistant";
   }
 }

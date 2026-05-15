@@ -1,29 +1,48 @@
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Billing from "./pages/Billing";
-import FinancialDashboard from "./pages/FinancialDashboard";
-import Modules from "./pages/Modules";
+import Login from "./pages/Login";
 
-function App() {
+import MainLayout from "./components/layout/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+export default function App() {
   return (
     <BrowserRouter>
-      <div style={{ display: "flex" }}>
-        <Sidebar />
+      <Routes>
 
-        <div style={{ flex: 1, padding: 20 }}>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/billing" element={<Billing />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/modules" element={<Modules />} /> 🔥
-          </Routes>
-        </div>
-      </div>
+        {/* 🔐 LOGIN */}
+        <Route path="/login" element={<Login />} />
+
+        {/* 🔒 DASHBOARD */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 💳 BILLING */}
+        <Route
+          path="/billing"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Billing />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 🚨 FALLBACK */}
+        <Route path="*" element={<Navigate to="/" />} />
+
+      </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;
