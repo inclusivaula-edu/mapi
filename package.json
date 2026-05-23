@@ -1,30 +1,20 @@
 {
-  "name": "mapi",
+  "name": "mapi-backend",
   "version": "1.0.0",
-  "description": "MAPI backend",
   "type": "module",
-  "main": "backend/src/server.js",
   "scripts": {
-    "dev": "node backend/src/server.js",
-    "start": "node backend/src/server.js",
-    "worker": "node backend/src/workers/lessonWorker.js"
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
-    "@fastify/cors": "^11.2.0",
-    "@fastify/rate-limit": "^10.3.0",
-    "@supabase/supabase-js": "^2.104.0",
-    "axios": "^1.15.2",
-    "bullmq": "^5.75.2",
-    "dotenv": "^16.6.1",
-    "fastify": "^5.8.5",
-    "ioredis": "^5.10.1",
-    "mercadopago": "^2.12.0",
-    "node-cron": "^4.2.1",
-    "node-fetch": "^3.3.2",
-    "openai": "^6.33.0",
-    "pdf-lib": "^1.17.1",
-    "pdfkit": "^0.18.0",
-    "react-router-dom": "^7.15.0",
-    "uuid": "^14.0.0"
+    "@fastify/cors": "^9.0.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.26.0",
+    "openai": "^4.28.0",
+    "pdfkit": "^0.14.0"
   }
 }
