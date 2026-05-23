@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MAPI Framework Dashboard</title>
+  </head>
+
+  <body>
+    <!-- 🔐 AUTH -->
+    <div id="auth">
+      <input id="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Senha" />
+      <button id="loginBtn">Entrar</button>
+      <button id="registerBtn">Criar conta</button>
+    </div>
+
+    <!-- 🚀 APP -->
+    <div id="app" style="display: none;">
+      <div id="chat"></div>
+      <input id="input" placeholder="Digite sua mensagem..." />
+      <button id="send">Enviar</button>
+      <button id="logoutBtn">Sair</button>
+    </div>
+
+    <!-- JS -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
