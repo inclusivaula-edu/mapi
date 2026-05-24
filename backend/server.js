@@ -169,3 +169,4 @@ app.post("/webhooks/billing", webhookController);
 app.listen({ port: process.env.PORT || 3000, host: "0.0.0.0" }).then(() => {
   console.log(`🔥 MAPI rodando na porta ${process.env.PORT || 3000}`);
 });
+
