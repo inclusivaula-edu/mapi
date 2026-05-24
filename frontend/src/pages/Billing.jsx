@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getToken } from "../services/auth";
+import { getToken } from "../services/auth.js";
 import { usePlan } from "../hooks/usePlan";
 
 export default function Billing() {
