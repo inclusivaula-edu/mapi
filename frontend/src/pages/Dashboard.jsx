@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getToken } from "../services/auth";
+import { getToken } from "../services/auth.js";
 import { useUsage } from "../hooks/useUsage";
 import UpgradeModal from "../components/UpgradeModal";
 
@@ -128,3 +128,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

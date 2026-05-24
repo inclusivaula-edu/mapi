@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { getToken } from "../services/auth";
+import { getToken } from "../services/auth.js";
 
 export const PlanContext = createContext();
 
@@ -52,3 +52,4 @@ export function PlanProvider({ children }) {
     </PlanContext.Provider>
   );
 }
+

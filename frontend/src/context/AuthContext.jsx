@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { supabase } from "../services/auth";
+import { supabase } from "../services/auth.js";
 
 export const AuthContext = createContext();
 
@@ -79,3 +79,4 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
