@@ -32,7 +32,7 @@ await app.register(cors, {
 // 🔐 AUTH
 // =============================
 app.addHook("preHandler", async (req, reply) => {
-  const openRoutes = ["/create-subscription", "/webhooks/billing"];
+  const openRoutes = ["/create-subscription", "/webhooks/billing", "/health"];
   if (openRoutes.some((r) => req.url.startsWith(r))) return;
 
   const token = req.headers.authorization?.replace("Bearer ", "");
