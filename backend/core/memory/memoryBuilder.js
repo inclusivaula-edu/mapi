@@ -49,7 +49,7 @@ ${ragText}
   ];
 
   // 🔥 5. AUTO RESUMO (quando crescer muito)
-  if (messages.length >= MAX_MESSAGES) {
+  if ((messages || []).length >= MAX_MESSAGES) {
     const newSummary = await summarizeMessages(reversed);
 
     await saveMemory(chatId, tenantId, newSummary);
@@ -57,4 +57,5 @@ ${ragText}
 
   return finalMessages;
 }
+
 
