@@ -15,7 +15,7 @@ export async function buildMemory({ module, input, chatId, tenantId }) {
     .order("created_at", { ascending: false })
     .limit(MAX_MESSAGES);
 
-  const reversed = messages.reverse();
+  const reversed = (messages || []).reverse();
 
   // 🔹 2. pega resumo salvo
   const summary = await getMemory(chatId);
@@ -57,3 +57,4 @@ ${ragText}
 
   return finalMessages;
 }
+
