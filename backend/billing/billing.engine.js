@@ -9,14 +9,14 @@ export async function isAllowed(userId) {
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("*")
-      .eq("user_id", userId)
+      .eq("tenant_id", userId)
       .single();
 
     // 📊 conta uso
     const { count } = await supabase
       .from("requests")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", userId);
+      .eq("tenant_id", userId);
 
     const usage = count || 0;
 
