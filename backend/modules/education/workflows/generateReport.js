@@ -1,7 +1,7 @@
-import { generateReport as genReport } from "../../ai/report.engine.js";
-import { generatePDF } from "../../ai/pdf.engine.js";
-import { getMemory } from "../../ai/memory.engine.js";
-import { supabase } from "../../services/dbService.js";
+import { generateReport as genReport } from "../../../src/ai/report.engine.js";
+import { generatePDF } from "../../../src/ai/pdf.engine.js";
+import { getMemory } from "../../../src/ai/memory.engine.js";
+import { supabase } from "../../../services/dbService.js";
 import fs from "fs";
 import path from "path";
 

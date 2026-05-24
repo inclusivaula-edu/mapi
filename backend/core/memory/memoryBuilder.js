@@ -1,4 +1,4 @@
-import { supabase } from "../../backend/services/dbService.js";
+import { supabase } from "../../services/dbService.js";
 import { searchContext } from "../rag/ragService.js";
 import { summarizeMessages } from "./summarizer.js";
 import { getMemory, saveMemory } from "./memoryStore.js";

@@ -1,7 +1,7 @@
 import OpenAI from "openai";
-import { buildMemory } from "../../ai/memoryBuilder.js";
-import { searchKnowledge } from "../../ai/rag.engine.js";
-import { saveMemory } from "../../ai/memory.engine.js";
+import { buildMemory } from "../../../core/memory/memoryBuilder.js";
+import { searchKnowledge } from "../../../src/ai/rag.engine.js";
+import { saveMemory } from "../../../src/ai/memory.engine.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

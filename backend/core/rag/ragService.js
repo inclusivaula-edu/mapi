@@ -1,5 +1,5 @@
 import { createEmbedding } from "./embeddingService.js";
-import { supabase } from "../../backend/services/dbService.js";
+import { supabase } from "../../services/dbService.js";
 
 // 🔍 BUSCAR CONTEXTO
 export async function searchContext(text, tenantId) {

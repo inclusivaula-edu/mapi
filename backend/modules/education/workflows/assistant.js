@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { buildMemory } from "../../ai/memoryBuilder.js";
+import { buildMemory } from "../../../core/memory/memoryBuilder.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

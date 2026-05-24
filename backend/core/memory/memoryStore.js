@@ -1,4 +1,4 @@
-import { supabase } from "../../backend/services/dbService.js";
+import { supabase } from "../../services/dbService.js";
 
 export async function getMemory(chatId) {
   const { data } = await supabase
