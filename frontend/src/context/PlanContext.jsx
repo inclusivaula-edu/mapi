@@ -19,7 +19,7 @@ export function PlanProvider({ children }) {
         return;
       }
 
-      const res = await fetch("http://localhost:3000/billing/dashboard", {
+      const res = await fetch("import.meta.env.VITE_API_URL || "http://localhost:3000"/billing/dashboard", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,4 +52,5 @@ export function PlanProvider({ children }) {
     </PlanContext.Provider>
   );
 }
+
 
