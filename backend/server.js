@@ -61,6 +61,17 @@ app.addHook("onResponse", async (req) => {
 });
 
 // =============================
+// ❤️ HEALTH CHECK
+// =============================
+app.get("/health", async (req, reply) => {
+  return reply.send({
+    status: "ok",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// =============================
 // 🧠 ROTA PRINCIPAL — MAPI
 // =============================
 app.post("/ai/run", { preHandler: billingGuard }, async (req, reply) => {
@@ -144,7 +155,6 @@ app.post("/ai/report/pdf", { preHandler: billingGuard }, async (req, reply) => {
 
     const stream = fs.createReadStream(filePath);
 
-    // ✅ limpa arquivo após download
     stream.on("close", () => {
       fs.unlink(filePath, (err) => {
         if (err) console.error("PDF CLEANUP ERROR:", err.message);
@@ -169,4 +179,3 @@ app.post("/webhooks/billing", webhookController);
 app.listen({ port: process.env.PORT || 3000, host: "0.0.0.0" }).then(() => {
   console.log(`🔥 MAPI rodando na porta ${process.env.PORT || 3000}`);
 });
-
