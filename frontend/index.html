@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAPI — Plataforma de IA para Educação e Direito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #12121a;
+      --border:    #1e1e2e;
+      --text:      #e8e8f0;
+      --muted:     #6b6b85;
+      --edu:       #4fffb0;
+      --jur:       #ff8c42;
+      --accent:    #7c6dfa;
+      --danger:    #ff4f6b;
+      --r:         10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+           min-height: 100vh; overflow-x: hidden; }
+    h1,h2,h3 { font-family: 'Syne', sans-serif; }
+
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between;
+          padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+          position: sticky; top: 0; background: var(--bg); z-index: 100; }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem;
+                letter-spacing: -.02em; }
+    .nav-logo span { color: var(--accent); }
+    .nav-actions { display: flex; gap: .75rem; }
+    .btn { padding: .55rem 1.25rem; border-radius: var(--r); font-size: .85rem;
+           font-weight: 500; cursor: pointer; border: none; transition: all .15s; font-family: inherit; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.15); }
+    .btn-edu { background: var(--edu); color: #0a0a0f; font-weight: 600; }
+    .btn-jur { background: var(--jur); color: #0a0a0f; font-weight: 600; }
+    .btn-sm { padding: .4rem .9rem; font-size: .78rem; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── LOGIN ── */
+    #view-login { display: flex; align-items: center; justify-content: center;
+                  min-height: calc(100vh - 61px); padding: 2rem; }
+    .login-card { background: var(--surface); border: 1px solid var(--border);
+                  border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; }
+    .login-card h2 { font-size: 1.6rem; margin-bottom: .4rem; }
+    .login-card p  { color: var(--muted); font-size: .9rem; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: .4rem; font-weight: 500; }
+    input, select, textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r); padding: .65rem .9rem; color: var(--text);
+      font-size: .88rem; font-family: inherit; transition: border .15s; }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+    .error-msg { color: var(--danger); font-size: .8rem; margin-top: .5rem; }
+
+    /* ── HERO ── */
+    #view-home { padding: 4rem 2rem 2rem; max-width: 900px; margin: 0 auto; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.1;
+               letter-spacing: -.03em; margin-bottom: 1rem; }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p  { color: var(--muted); font-size: 1.05rem; max-width: 520px; margin-bottom: 2rem; line-height: 1.6; }
+    .module-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2rem; }
+    .module-card { background: var(--surface); border: 1px solid var(--border);
+                   border-radius: 14px; padding: 1.75rem; cursor: pointer;
+                   transition: border-color .2s, transform .2s; }
+    .module-card:hover { transform: translateY(-3px); }
+    .module-card.edu:hover { border-color: var(--edu); }
+    .module-card.jur:hover { border-color: var(--jur); }
+    .module-icon { font-size: 2rem; margin-bottom: .75rem; }
+    .module-card h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+    .module-card p  { font-size: .83rem; color: var(--muted); line-height: 1.5; }
+    .tag { display: inline-block; padding: .2rem .6rem; border-radius: 4px;
+           font-size: .7rem; font-weight: 600; margin-top: .75rem; }
+    .tag.edu { background: #0d3320; color: var(--edu); }
+    .tag.jur { background: #3d2010; color: var(--jur); }
+
+    /* ── MÓDULO ── */
+    #view-edu, #view-jur { padding: 2rem; max-width: 860px; margin: 0 auto; }
+    .module-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .module-header h2 { font-size: 1.5rem; }
+    .back-btn { background: none; border: none; color: var(--muted); cursor: pointer;
+                font-size: 1.2rem; padding: .3rem; transition: color .15s; }
+    .back-btn:hover { color: var(--text); }
+    .skill-tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .skill-tab { padding: .45rem 1rem; border-radius: 20px; font-size: .8rem; font-weight: 500;
+                 cursor: pointer; border: 1px solid var(--border); background: transparent;
+                 color: var(--muted); transition: all .15s; font-family: inherit; }
+    .skill-tab.active.edu { background: var(--edu); color: #0a0a0f; border-color: var(--edu); }
+    .skill-tab.active.jur { background: var(--jur); color: #0a0a0f; border-color: var(--jur); }
+    .skill-tab:hover:not(.active) { color: var(--text); border-color: var(--muted); }
+    .form-card { background: var(--surface); border: 1px solid var(--border);
+                 border-radius: 14px; padding: 1.75rem; margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .submit-row { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+
+    /* ── RESULTADO ── */
+    .result-card { background: var(--surface); border: 1px solid var(--border);
+                   border-radius: 14px; padding: 1.75rem; }
+    .result-header { display: flex; align-items: center; justify-content: space-between;
+                     margin-bottom: 1.25rem; }
+    .result-header h3 { font-size: 1rem; }
+    .result-actions { display: flex; gap: .5rem; }
+    .result-body { font-size: .88rem; line-height: 1.7; color: var(--text); }
+    .result-body h4 { font-family: 'Syne', sans-serif; font-size: .9rem; color: var(--muted);
+                      text-transform: uppercase; letter-spacing: .05em;
+                      margin: 1.25rem 0 .4rem; font-weight: 600; }
+    .result-body h4:first-child { margin-top: 0; }
+    .result-body ul { padding-left: 1.2rem; }
+    .result-body ul li { margin-bottom: .3rem; }
+    .result-body .disclaimer { margin-top: 1.25rem; padding: .85rem 1rem;
+      background: #1a1212; border: 1px solid #3d1a1a; border-radius: 8px;
+      color: #cc8888; font-size: .78rem; line-height: 1.5; }
+    .meta-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;
+                padding-top: 1rem; border-top: 1px solid var(--border); }
+    .meta-item { font-size: .75rem; color: var(--muted); }
+    .meta-item strong { color: var(--text); }
+    .score-badge { display: inline-flex; align-items: center; gap: .3rem;
+                   padding: .2rem .65rem; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .score-high { background: #0d3320; color: var(--edu); }
+    .score-mid  { background: #2d2510; color: #fbbf24; }
+    .score-low  { background: #2d0f18; color: var(--danger); }
+
+    /* ── LOADING ── */
+    .loading { display: flex; align-items: center; gap: .75rem; color: var(--muted);
+               padding: 2rem; font-size: .9rem; }
+    .spinner { width: 18px; height: 18px; border: 2px solid var(--border);
+               border-top-color: var(--accent); border-radius: 50%;
+               animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+             display: flex; flex-direction: column; gap: .5rem; }
+    .toast-item { padding: .75rem 1.2rem; border-radius: 10px; font-size: .82rem;
+                  animation: slideIn .25s ease; max-width: 320px; }
+    .toast-item.ok  { background: #0d3320; border: 1px solid var(--edu); color: var(--edu); }
+    .toast-item.err { background: #2d0f18; border: 1px solid var(--danger); color: var(--danger); }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    @media (max-width: 600px) {
+      .module-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      nav { padding: .75rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">M<span>API</span></div>
+  <div class="nav-actions" id="nav-actions">
+    <button class="btn btn-ghost btn-sm" onclick="showLogin()">Entrar</button>
+    <button class="btn btn-primary btn-sm" onclick="showRegister()">Criar conta</button>
+  </div>
+</nav>
+
+<!-- ── LOGIN / CADASTRO ── -->
+<div class="view active" id="view-login">
+  <div id="login-panel" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 61px);padding:2rem;">
+    <div class="login-card">
+      <h2>Entrar no MAPI</h2>
+      <p>Plataforma de IA para educação inclusiva e documentos jurídicos</p>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="login-error" class="error-msg"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="doLogin()">Entrar</button>
+      <p style="text-align:center;margin-top:1rem;font-size:.83rem;color:var(--muted)">
+        Não tem conta? <a href="#" onclick="showRegister()" style="color:var(--accent)">Cadastre sua escola</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── HOME ── -->
+<div class="view" id="view-home">
+  <div id="view-home-inner">
+    <div class="hero">
+      <h1>Inteligência artificial para quem<br><em>constrói o futuro</em></h1>
+      <p>Gere aulas inclusivas, PEIs, relatórios pedagógicos, contratos e pareceres jurídicos em segundos — com embasamento técnico real.</p>
+    </div>
+    <div class="module-grid">
+      <div class="module-card edu" onclick="openModule('edu')">
+        <div class="module-icon">🎓</div>
+        <h3>Educação Inclusiva</h3>
+        <p>Aulas adaptadas por diagnóstico, PEI completo, relatórios AEE e assistente pedagógico.</p>
+        <span class="tag edu">AEE · BNCC · MEC</span>
+      </div>
+      <div class="module-card jur" onclick="openModule('jur')">
+        <div class="module-icon">⚖️</div>
+        <h3>Jurídico</h3>
+        <p>Contratos, pareceres, minutas de petições, resumos de legislação e assistente jurídico.</p>
+        <span class="tag jur">CLT · CC · CDC · OAB</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MÓDULO EDUCAÇÃO ── -->
+<div class="view" id="view-edu">
+  <div class="module-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="module-icon" style="font-size:1.5rem">🎓</div>
+    <h2>Educação Inclusiva</h2>
+  </div>
+
+  <div class="skill-tabs" id="edu-tabs">
+    <button class="skill-tab active edu" onclick="setSkill('edu','gerar-aula',this)">Gerar Aula</button>
+    <button class="skill-tab" onclick="setSkill('edu','gerar-pei',this)">Gerar PEI</button>
+    <button class="skill-tab" onclick="setSkill('edu','gerar-relatorio',this)">Relatório AEE</button>
+    <button class="skill-tab" onclick="setSkill('edu','assistente',this)">Assistente</button>
+  </div>
+
+  <!-- Gerar Aula -->
+  <div id="edu-form-gerar-aula" class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do aluno</label>
+        <input id="e-student-name" placeholder="Ex: Lucas Oliveira">
+      </div>
+      <div class="form-group">
+        <label>Diagnóstico</label>
+        <select id="e-diagnosis">
+          <option value="">Não informado</option>
+          <option>TEA</option><option>TDAH</option><option>Síndrome de Down</option>
+          <option>Deficiência Visual</option><option>Deficiência Auditiva</option>
+          <option>Deficiência Intelectual</option><option>Dislexia</option>
+          <option>Paralisia Cerebral</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Série</label>
+        <select id="e-grade">
+          <option value="">Não informada</option>
+          <option>1º ano EF</option><option>2º ano EF</option><option>3º ano EF</option>
+          <option>4º ano EF</option><option>5º ano EF</option><option>6º ano EF</option>
+          <option>7º ano EF</option><option>8º ano EF</option><option>9º ano EF</option>
+          <option>1º ano EM</option><option>2º ano EM</option><option>3º ano EM</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tema da aula</label>
+        <input id="e-topic" placeholder="Ex: frações simples">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-edu" onclick="submitEdu('gerar-aula')">Gerar Aula ✦</button>
+    </div>
+  </div>
+
+  <!-- Gerar PEI -->
+  <div id="edu-form-gerar-pei" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do aluno</label>
+        <input id="e-pei-name" placeholder="Ex: Maria Santos">
+      </div>
+      <div class="form-group">
+        <label>Diagnóstico *</label>
+        <select id="e-pei-diagnosis">
+          <option value="">Selecione...</option>
+          <option>TEA</option><option>TDAH</option><option>Síndrome de Down</option>
+          <option>Deficiência Visual</option><option>Deficiência Auditiva</option>
+          <option>Deficiência Intelectual</option><option>Dislexia</option>
+          <option>Paralisia Cerebral</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Série</label>
+        <input id="e-pei-grade" placeholder="Ex: 4º ano EF">
+      </div>
+      <div class="form-group">
+        <label>Idade</label>
+        <input id="e-pei-age" placeholder="Ex: 9">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Principal dificuldade observada</label>
+      <input id="e-pei-difficulty" placeholder="Ex: leitura e escrita, socialização, matemática">
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-edu" onclick="submitEdu('gerar-pei')">Gerar PEI Completo ✦</button>
+    </div>
+  </div>
+
+  <!-- Relatório AEE -->
+  <div id="edu-form-gerar-relatorio" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do aluno</label>
+        <input id="e-rel-name" placeholder="Ex: João Pedro">
+      </div>
+      <div class="form-group">
+        <label>Tipo de relatório</label>
+        <select id="e-rel-type">
+          <option value="ANAMNESE">Anamnese</option>
+          <option value="PEI">PEI</option>
+          <option value="PAEE">PAEE</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Diagnóstico</label>
+        <input id="e-rel-diagnosis" placeholder="Ex: TEA, TDAH, Down...">
+      </div>
+      <div class="form-group">
+        <label>Série</label>
+        <input id="e-rel-grade" placeholder="Ex: 3º ano EF">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-edu" onclick="submitEdu('gerar-relatorio')">Gerar Relatório ✦</button>
+    </div>
+  </div>
+
+  <!-- Assistente -->
+  <div id="edu-form-assistente" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Sua dúvida pedagógica</label>
+      <textarea id="e-assistente-input" rows="4"
+        placeholder="Ex: Como adaptar uma atividade de interpretação de texto para um aluno com TEA no 5º ano?"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-edu" onclick="submitEdu('assistente')">Perguntar ✦</button>
+    </div>
+  </div>
+
+  <div id="edu-result"></div>
+</div>
+
+<!-- ── MÓDULO JURÍDICO ── -->
+<div class="view" id="view-jur">
+  <div class="module-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="module-icon" style="font-size:1.5rem">⚖️</div>
+    <h2>Jurídico</h2>
+  </div>
+
+  <div class="skill-tabs" id="jur-tabs">
+    <button class="skill-tab active jur" onclick="setSkill('jur','gerar-contrato',this)">Gerar Contrato</button>
+    <button class="skill-tab" onclick="setSkill('jur','analisar-contrato',this)">Analisar Contrato</button>
+    <button class="skill-tab" onclick="setSkill('jur','gerar-parecer',this)">Parecer</button>
+    <button class="skill-tab" onclick="setSkill('jur','resumir-legislacao',this)">Legislação</button>
+    <button class="skill-tab" onclick="setSkill('jur','assistente-juridico',this)">Assistente</button>
+  </div>
+
+  <!-- Gerar Contrato -->
+  <div id="jur-form-gerar-contrato" class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo de contrato</label>
+        <select id="j-tipo">
+          <option value="prestacao-servicos">Prestação de Serviços</option>
+          <option value="compra-venda">Compra e Venda</option>
+          <option value="locacao">Locação</option>
+          <option value="parceria-empresarial">Parceria Empresarial</option>
+          <option value="trabalho-autonomo">Trabalho Autônomo</option>
+          <option value="nda">NDA (Confidencialidade)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Área do direito</label>
+        <select id="j-area">
+          <option value="civil">Civil</option>
+          <option value="empresarial">Empresarial</option>
+          <option value="trabalhista">Trabalhista</option>
+          <option value="consumidor">Consumidor</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Descrição do contrato</label>
+      <textarea id="j-descricao" rows="3"
+        placeholder="Ex: Contrato de desenvolvimento de software para e-commerce, pagamento em 3 parcelas, prazo de 60 dias"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Parte A (Contratante)</label>
+        <input id="j-parte-a" placeholder="Ex: Empresa X Ltda">
+      </div>
+      <div class="form-group">
+        <label>Parte B (Contratado)</label>
+        <input id="j-parte-b" placeholder="Ex: João Silva — Dev Freelancer">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-jur" onclick="submitJur('gerar-contrato')">Gerar Contrato ✦</button>
+    </div>
+  </div>
+
+  <!-- Analisar Contrato -->
+  <div id="jur-form-analisar-contrato" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Cole o texto do contrato para análise</label>
+      <textarea id="j-contrato-texto" rows="8"
+        placeholder="Cole aqui o contrato que deseja analisar..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-jur" onclick="submitJur('analisar-contrato')">Analisar ✦</button>
+    </div>
+  </div>
+
+  <!-- Parecer -->
+  <div id="jur-form-gerar-parecer" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Área do direito</label>
+        <select id="j-parecer-area">
+          <option value="trabalhista">Trabalhista</option>
+          <option value="civil">Civil</option>
+          <option value="consumidor">Consumidor</option>
+          <option value="tributário">Tributário</option>
+          <option value="empresarial">Empresarial</option>
+          <option value="previdenciário">Previdenciário</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Questão jurídica</label>
+      <textarea id="j-parecer-questao" rows="3"
+        placeholder="Ex: Funcionário demitido por justa causa após 8 anos, alega demissão arbitrária. Quais os direitos?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Fatos relevantes (opcional)</label>
+      <textarea id="j-parecer-fatos" rows="2"
+        placeholder="Contexto adicional que o parecer deve considerar..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-jur" onclick="submitJur('gerar-parecer')">Gerar Parecer ✦</button>
+    </div>
+  </div>
+
+  <!-- Legislação -->
+  <div id="jur-form-resumir-legislacao" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tema</label>
+        <input id="j-leg-tema" placeholder="Ex: LGPD, CLT rescisão, CDC produto defeituoso">
+      </div>
+      <div class="form-group">
+        <label>Nível de detalhe</label>
+        <select id="j-leg-nivel">
+          <option value="executivo">Executivo (leigos)</option>
+          <option value="tecnico">Técnico (profissionais)</option>
+          <option value="completo">Completo (aprofundado)</option>
+        </select>
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-jur" onclick="submitJur('resumir-legislacao')">Resumir ✦</button>
+    </div>
+  </div>
+
+  <!-- Assistente Jurídico -->
+  <div id="jur-form-assistente-juridico" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Sua dúvida jurídica</label>
+      <textarea id="j-assistente-input" rows="4"
+        placeholder="Ex: Tenho direito a horas extras trabalhando em home office?"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-jur" onclick="submitJur('assistente-juridico')">Perguntar ✦</button>
+    </div>
+  </div>
+
+  <div id="jur-result"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000';
+  let token = localStorage.getItem('mapi_token') ?? '';
+  let currentEduSkill = 'gerar-aula';
+  let currentJurSkill = 'gerar-contrato';
+
+  // ── AUTH ───────────────────────────────────────────────────
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    document.getElementById('login-error').textContent = '';
+
+    if (!email || !pass) {
+      document.getElementById('login-error').textContent = 'Preencha e-mail e senha.';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        token = data.access_token ?? data.token ?? '';
+        localStorage.setItem('mapi_token', token);
+        showHome();
+      } else {
+        // Demo mode: se backend não tiver /auth/login ainda, pede token direto
+        const t = prompt('Backend não respondeu. Cole seu JWT do Supabase:');
+        if (t) { token = t; localStorage.setItem('mapi_token', t); showHome(); }
+        else document.getElementById('login-error').textContent = 'Login falhou. Verifique e-mail e senha.';
+      }
+    } catch {
+      const t = prompt('Servidor offline. Cole seu JWT do Supabase para continuar:');
+      if (t) { token = t; localStorage.setItem('mapi_token', t); showHome(); }
+    }
+  }
+
+  function showRegister() {
+    window.open('https://supabase.com', '_blank');
+    toast('Crie sua conta no Supabase e cadastre a escola via POST /org/register', 'ok');
+  }
+
+  function showLogin()  { document.getElementById('login-panel').style.display = 'flex'; }
+
+  // ── NAVEGAÇÃO ──────────────────────────────────────────────
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showHome() {
+    showView('view-home');
+    document.getElementById('nav-actions').innerHTML =
+      `<span style="font-size:.8rem;color:var(--muted);margin-right:.5rem">Conectado</span>
+       <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sair</button>`;
+  }
+
+  function goHome() { showView('view-home'); }
+
+  function openModule(mod) {
+    if (!token) { toast('Faça login primeiro', 'err'); return; }
+    showView(`view-${mod}`);
+  }
+
+  function doLogout() {
+    token = ''; localStorage.removeItem('mapi_token');
+    showView('view-login');
+    document.getElementById('nav-actions').innerHTML =
+      `<button class="btn btn-ghost btn-sm" onclick="showLogin()">Entrar</button>
+       <button class="btn btn-primary btn-sm" onclick="showRegister()">Criar conta</button>`;
+  }
+
+  // ── SKILL TABS ─────────────────────────────────────────────
+  function setSkill(mod, skill, btn) {
+    const prefix = mod === 'edu' ? 'edu' : 'jur';
+    document.querySelectorAll(`#${prefix}-tabs .skill-tab`).forEach(t => t.classList.remove('active', 'edu', 'jur'));
+    btn.classList.add('active', mod);
+    document.querySelectorAll(`[id^="${prefix}-form-"]`).forEach(f => f.style.display = 'none');
+    const form = document.getElementById(`${prefix}-form-${skill}`);
+    if (form) form.style.display = 'block';
+    if (mod === 'edu') { currentEduSkill = skill; document.getElementById('edu-result').innerHTML = ''; }
+    else               { currentJurSkill = skill; document.getElementById('jur-result').innerHTML = ''; }
+  }
+
+  // ── EDUCATION ──────────────────────────────────────────────
+  async function submitEdu(skill) {
+    const resultEl = document.getElementById('edu-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Gerando com IA...</div>';
+
+    let body = {};
+    if (skill === 'gerar-aula') {
+      const name = document.getElementById('e-student-name').value.trim();
+      const topic = document.getElementById('e-topic').value.trim();
+      if (!name || !topic) { toast('Preencha nome do aluno e tema', 'err'); resultEl.innerHTML = ''; return; }
+      body = {
+        topic,
+        student: {
+          name,
+          grade:     document.getElementById('e-grade').value,
+          diagnosis: document.getElementById('e-diagnosis').value,
+        },
+      };
+    } else if (skill === 'gerar-pei') {
+      const name = document.getElementById('e-pei-name').value.trim();
+      const diagnosis = document.getElementById('e-pei-diagnosis').value;
+      if (!name || !diagnosis) { toast('Nome e diagnóstico são obrigatórios para o PEI', 'err'); resultEl.innerHTML = ''; return; }
+      body = {
+        student: { name, diagnosis, grade: document.getElementById('e-pei-grade').value,
+                   age: document.getElementById('e-pei-age').value,
+                   mainDifficulty: document.getElementById('e-pei-difficulty').value },
+      };
+    } else if (skill === 'gerar-relatorio') {
+      body = {
+        type: document.getElementById('e-rel-type').value,
+        student: { name: document.getElementById('e-rel-name').value.trim(),
+                   diagnosis: document.getElementById('e-rel-diagnosis').value,
+                   grade: document.getElementById('e-rel-grade').value },
+      };
+    } else if (skill === 'assistente') {
+      const input = document.getElementById('e-assistente-input').value.trim();
+      if (!input) { toast('Digite sua dúvida', 'err'); resultEl.innerHTML = ''; return; }
+      body = { input };
+    }
+
+    const endpoint = { 'gerar-aula': '/ai/lesson', 'gerar-pei': '/ai/pei',
+                       'gerar-relatorio': '/ai/report', 'assistente': '/ai/run' }[skill];
+    if (skill === 'assistente') body.context = {};
+
+    try {
+      const res = await apiFetch(endpoint, body);
+      renderEduResult(res, skill, resultEl);
+    } catch (err) {
+      resultEl.innerHTML = `<div class="result-card"><p style="color:var(--danger)">${err.message}</p></div>`;
+    }
+  }
+
+  function renderEduResult(data, skill, el) {
+    const r = data.response ?? data;
+    if (!r) { el.innerHTML = '<div class="result-card"><p>Sem resultado.</p></div>'; return; }
+
+    if (skill === 'assistente') {
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>💬 Assistente Pedagógico</h3></div>
+        <div class="result-body"><p>${(r.content ?? r).replace(/\n/g,'<br>')}</p></div>
+      </div>`; return;
+    }
+
+    const score = r._meta?.reviewScore ?? r.validation?.score;
+    const scoreBadge = score != null
+      ? `<span class="score-badge ${score >= 8 ? 'score-high' : score >= 6 ? 'score-mid' : 'score-low'}">Score ${score}/10</span>`
+      : '';
+
+    if (skill === 'gerar-aula') {
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header">
+          <h3>📚 ${r.title ?? 'Aula Gerada'}</h3>
+          <div class="result-actions">${scoreBadge}</div>
+        </div>
+        <div class="result-body">
+          <h4>Código BNCC</h4><p>${r.bncc ?? '—'}</p>
+          <h4>Objetivo</h4><p>${r.objective ?? '—'}</p>
+          <h4>Explicação</h4><p>${r.explanation ?? '—'}</p>
+          <h4>Exemplo Prático</h4><p>${r.example ?? '—'}</p>
+          <h4>Atividades</h4>
+          <ul>${(r.activities ?? []).map(a => `<li>${a}</li>`).join('')}</ul>
+          <h4>Adaptações Inclusivas</h4><p>${r.adaptations ?? '—'}</p>
+          ${r._meta ? `<div class="meta-bar">
+            <span class="meta-item">Iterações: <strong>${r._meta.iterations}</strong></span>
+            <span class="meta-item">Tokens: <strong>${r._meta.tokensUsed}</strong></span>
+            <span class="meta-item">Tempo: <strong>${r._meta.durationMs}ms</strong></span>
+          </div>` : ''}
+        </div></div>`;
+    } else {
+      // PEI, relatório — renderiza seções genéricas
+      const sections = r.sections ?? r.secoes ?? [];
+      const sHtml = sections.map(s => `<h4>${s.name ?? s.titulo}</h4><p>${(s.content ?? s.conteudo ?? '').replace(/\n/g,'<br>')}</p>`).join('');
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>📄 ${r.type ?? skill.toUpperCase()}</h3>${scoreBadge}</div>
+        <div class="result-body">${sHtml || JSON.stringify(r, null, 2)}</div>
+      </div>`;
+    }
+    toast('Gerado com sucesso', 'ok');
+  }
+
+  // ── JURIDICO ───────────────────────────────────────────────
+  async function submitJur(skill) {
+    const resultEl = document.getElementById('jur-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Consultando legislação e gerando documento...</div>';
+
+    let body = { skill };
+
+    if (skill === 'gerar-contrato') {
+      body.tipo      = document.getElementById('j-tipo').value;
+      body.area      = document.getElementById('j-area').value;
+      body.descricao = document.getElementById('j-descricao').value.trim();
+      body.partes    = [
+        { papel: 'Contratante', nome: document.getElementById('j-parte-a').value.trim() },
+        { papel: 'Contratado',  nome: document.getElementById('j-parte-b').value.trim() },
+      ].filter(p => p.nome);
+      if (!body.descricao) { toast('Descrição é obrigatória', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'analisar-contrato') {
+      body.contrato = document.getElementById('j-contrato-texto').value.trim();
+      if (!body.contrato) { toast('Cole o texto do contrato', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-parecer') {
+      body.area    = document.getElementById('j-parecer-area').value;
+      body.questao = document.getElementById('j-parecer-questao').value.trim();
+      body.fatos   = document.getElementById('j-parecer-fatos').value.trim();
+      if (!body.questao) { toast('A questão jurídica é obrigatória', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'resumir-legislacao') {
+      body.tema         = document.getElementById('j-leg-tema').value.trim();
+      body.nivelDetalhe = document.getElementById('j-leg-nivel').value;
+      if (!body.tema) { toast('Informe o tema', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'assistente-juridico') {
+      body.input = document.getElementById('j-assistente-input').value.trim();
+      if (!body.input) { toast('Digite sua dúvida', 'err'); resultEl.innerHTML = ''; return; }
+    }
+
+    try {
+      const res = await apiFetch('/ai/juridico', body);
+      renderJurResult(res, skill, resultEl);
+    } catch (err) {
+      resultEl.innerHTML = `<div class="result-card"><p style="color:var(--danger)">${err.message}</p></div>`;
+    }
+  }
+
+  function renderJurResult(data, skill, el) {
+    const r = data.response ?? data;
+    if (!r) { el.innerHTML = '<div class="result-card"><p>Sem resultado.</p></div>'; return; }
+
+    const score = r.validation?.score ?? r._meta?.validationScore;
+    const scoreBadge = score != null
+      ? `<span class="score-badge ${score >= 8 ? 'score-high' : score >= 6 ? 'score-mid' : 'score-low'}">Jurídico ${score}/10</span>`
+      : '';
+
+    if (skill === 'assistente-juridico') {
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>⚖️ Assistente Jurídico</h3></div>
+        <div class="result-body">
+          <p>${(r.content ?? r).replace(/\n/g,'<br>')}</p>
+          <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Esta resposta é informativa e não substitui consultoria jurídica profissional.'}</div>
+        </div></div>`; return;
+    }
+
+    if (skill === 'resumir-legislacao') {
+      const legs = (r.legislacao_principal ?? []).map(l =>
+        `<li><strong>${l.lei}</strong>${l.artigo ? ' — ' + l.artigo : ''}: ${l.o_que_diz ?? l.ementa ?? ''}</li>`).join('');
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>📋 ${r.tema ?? 'Resumo'}</h3></div>
+        <div class="result-body">
+          <p>${r.resumo_executivo ?? ''}</p>
+          ${r.pontos_chave?.length ? `<h4>Pontos-Chave</h4><ul>${r.pontos_chave.map(p=>`<li>${p}</li>`).join('')}</ul>` : ''}
+          ${legs ? `<h4>Legislação Principal</h4><ul>${legs}</ul>` : ''}
+          ${r.quando_procurar_advogado ? `<h4>Quando Procurar Advogado</h4><p>${r.quando_procurar_advogado}</p>` : ''}
+          <div class="disclaimer">⚠️ ${r.disclaimer ?? ''}</div>
+        </div></div>`; return;
+    }
+
+    // Contrato, Parecer, Análise — renderização genérica de seções
+    const clausulas = r.clausulas ?? r.secoes ?? [];
+    const clausHtml = clausulas.map(c =>
+      `<h4>${c.titulo ?? c.name ?? ''}</h4><p>${(c.conteudo ?? c.content ?? '').replace(/\n/g,'<br>')}</p>`
+    ).join('');
+    const legHtml = (r.legislacao_aplicada ?? []).map(l =>
+      `<li>${l.lei}${l.artigo ? ' — ' + l.artigo : ''}: ${l.ementa ?? ''}</li>`).join('');
+
+    el.innerHTML = `<div class="result-card">
+      <div class="result-header">
+        <h3>📄 ${r.titulo ?? skill}</h3>
+        <div class="result-actions">${scoreBadge}</div>
+      </div>
+      <div class="result-body">
+        ${r.preambulo ? `<p>${r.preambulo}</p>` : ''}
+        ${clausHtml}
+        ${legHtml ? `<h4>Legislação Aplicada</h4><ul>${legHtml}</ul>` : ''}
+        ${r._meta ? `<div class="meta-bar">
+          <span class="meta-item">Gerado em: <strong>${r._meta.generatedIn ?? r._meta.durationMs + 'ms'}</strong></span>
+          ${r._meta.subagents ? `<span class="meta-item">Subagentes: <strong>${r._meta.subagents}</strong></span>` : ''}
+        </div>` : ''}
+        <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Este documento foi gerado por IA. Revise com advogado habilitado antes de usar.'}</div>
+      </div></div>`;
+    toast('Documento gerado', 'ok');
+  }
+
+  // ── API FETCH ──────────────────────────────────────────────
+  async function apiFetch(endpoint, body) {
+    const res = await fetch(API + endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:    JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail ?? data.error ?? `Erro ${res.status}`);
+    return data;
+  }
+
+  // ── TOAST ──────────────────────────────────────────────────
+  function toast(msg, type = 'ok') {
+    const el = document.createElement('div');
+    el.className = `toast-item ${type}`;
+    el.textContent = msg;
+    document.getElementById('toast').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // ── INIT ───────────────────────────────────────────────────
+  if (token) showHome();
+</script>
+</body>
+</html>
