@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === "production" && !process.env.WEBHOOK_SECRET) {
 
 const isDev = process.env.NODE_ENV !== "production";
 
-import { supabase }           from "./services/dbService.js";
+import { supabase, supabaseAuth } from "./services/dbService.js";
 import { billingGuard }       from "./billing/billing.guard.js";
 import { writeLedger }        from "./billing/ledger.engine.js";
 import { EVENTS }             from "./billing/events/billing.events.js";
@@ -117,7 +117,7 @@ app.addHook("preHandler", async (req, reply) => {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return reply.code(401).send({ error: "TOKEN_NAO_ENVIADO" });
 
-  const { data, error } = await supabase.auth.getUser(token);
+  const { data, error } = await supabaseAuth.auth.getUser(token);
   if (error || !data?.user) return reply.code(401).send({ error: "USUARIO_INVALIDO" });
 
   req.user = data.user;

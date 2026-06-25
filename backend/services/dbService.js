@@ -19,3 +19,15 @@ export const supabase = createClient(
   SUPABASE_SERVICE_ROLE_KEY ?? SUPABASE_ANON_KEY,
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
+
+/**
+ * Cliente separado para validar JWTs no auth hook.
+ * Usar supabase.auth.getUser(token) no cliente service_role contamina
+ * o estado interno e faz queries subsequentes usarem RLS do usuário.
+ * Este cliente isolado evita esse efeito colateral.
+ */
+export const supabaseAuth = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY ?? SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);

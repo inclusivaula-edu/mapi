@@ -15,7 +15,7 @@ export async function resolvetenant(userId, orgId = null) {
 
     if (orgId) memberQuery = memberQuery.eq("organization_id", orgId);
 
-    const { data: member, error: memberErr } = await memberQuery.limit(1).single();
+    const { data: member, error: memberErr } = await memberQuery.maybeSingle();
 
     if (memberErr || !member) {
       logger.warn("tenantService: membro não encontrado", { userId, error: memberErr?.message });
