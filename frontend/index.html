@@ -48,8 +48,8 @@
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
     /* ── VIEWS ── */
-    .view { display: none; }
-    .view.active { display: block; }
+    .view { display: none !important; }
+    .view.active { display: block !important; }
 
     /* ── LOGIN ── */
     #view-login { display: flex; align-items: center; justify-content: center;
@@ -520,10 +520,15 @@
 
   <div class="skill-tabs" id="lic-tabs">
     <button class="skill-tab active lic" onclick="setSkill('lic','parse-edital',this)">Analisar Edital</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-etp',this)">ETP</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-tr',this)">Termo de Referência</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-proposta',this)">Proposta Técnica</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-memorial',this)">Memorial</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-planilha',this)">Planilha de Preços</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-declaracao',this)">Declarações</button>
+    <button class="skill-tab" onclick="setSkill('lic','checklist-sicaf',this)">SICAF</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-arp',this)">ARP</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-minuta-contrato',this)">Minuta Contrato</button>
     <button class="skill-tab" onclick="setSkill('lic','assistente-licitacao',this)">Assistente</button>
   </div>
 
@@ -645,6 +650,180 @@
     </div>
     <div class="submit-row">
       <button class="btn btn-lic" onclick="submitLic('assistente-licitacao')">Perguntar ✦</button>
+    </div>
+  </div>
+
+  <!-- ETP -->
+  <div id="lic-form-gerar-etp" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto da contratação</label>
+      <input id="l-etp-objeto" placeholder="Ex: Aquisição de computadores para laboratório de informática">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Necessidade identificada</label>
+        <input id="l-etp-necessidade" placeholder="Ex: Modernização do parque tecnológico">
+      </div>
+      <div class="form-group">
+        <label>Estimativa de valor (R$)</label>
+        <input id="l-etp-valor" placeholder="Ex: R$ 250.000,00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Prazo previsto</label>
+        <input id="l-etp-prazo" placeholder="Ex: 30 dias após emissão de OC">
+      </div>
+      <div class="form-group">
+        <label>Órgão demandante</label>
+        <input id="l-etp-orgao" placeholder="Ex: Ministério da Educação">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-etp')">Gerar ETP ✦</button>
+    </div>
+  </div>
+
+  <!-- TR -->
+  <div id="lic-form-gerar-tr" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto da contratação</label>
+      <input id="l-tr-objeto" placeholder="Ex: Prestação de serviços de limpeza e conservação predial">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Modalidade</label>
+        <select id="l-tr-modalidade">
+          <option value="Pregão Eletrônico">Pregão Eletrônico</option>
+          <option value="Concorrência">Concorrência</option>
+          <option value="Dispensa de Licitação">Dispensa de Licitação</option>
+          <option value="Inexigibilidade">Inexigibilidade</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Critério de julgamento</label>
+        <select id="l-tr-criterio">
+          <option value="Menor Preço">Menor Preço</option>
+          <option value="Melhor Técnica">Melhor Técnica</option>
+          <option value="Técnica e Preço">Técnica e Preço</option>
+          <option value="Maior Retorno Econômico">Maior Retorno Econômico</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Prazo de execução/vigência</label>
+        <input id="l-tr-prazo" placeholder="Ex: 12 meses, prorrogável">
+      </div>
+      <div class="form-group">
+        <label>Valor estimado (R$)</label>
+        <input id="l-tr-valor" placeholder="Ex: R$ 180.000,00/ano">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-tr')">Gerar TR ✦</button>
+    </div>
+  </div>
+
+  <!-- SICAF -->
+  <div id="lic-form-checklist-sicaf" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto da licitação</label>
+      <input id="l-sicaf-objeto" placeholder="Ex: Fornecimento de material de escritório">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo de empresa</label>
+        <select id="l-sicaf-tipo">
+          <option value="geral">Empresa geral</option>
+          <option value="me-epp">ME / EPP (Microempresa ou EPP)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Modalidade</label>
+        <select id="l-sicaf-modal">
+          <option value="pregao-eletronico">Pregão Eletrônico</option>
+          <option value="concorrencia">Concorrência</option>
+          <option value="dispensa">Dispensa</option>
+        </select>
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('checklist-sicaf')">Gerar Checklist SICAF ✦</button>
+    </div>
+  </div>
+
+  <!-- ARP -->
+  <div id="lic-form-gerar-arp" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto do registro de preços</label>
+      <input id="l-arp-objeto" placeholder="Ex: Registro de preços para aquisição de combustíveis">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Órgão gerenciador</label>
+        <input id="l-arp-orgao" placeholder="Ex: Secretaria de Logística — SEGES/MGI">
+      </div>
+      <div class="form-group">
+        <label>Validade da ARP</label>
+        <select id="l-arp-validade">
+          <option value="12 meses">12 meses (máximo legal)</option>
+          <option value="6 meses">6 meses</option>
+          <option value="3 meses">3 meses</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Itens registrados (descrição, qtd, unidade)</label>
+      <textarea id="l-arp-itens" rows="3" placeholder="Ex: Gasolina comum | 10.000 | litros&#10;Óleo diesel S10 | 5.000 | litros"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-arp')">Gerar ARP ✦</button>
+    </div>
+  </div>
+
+  <!-- Minuta de Contrato -->
+  <div id="lic-form-gerar-minuta-contrato" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto do contrato</label>
+      <input id="l-mc-objeto" placeholder="Ex: Prestação de serviços de desenvolvimento de software">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Contratante (órgão público)</label>
+        <input id="l-mc-contratante" placeholder="Ex: Ministério da Saúde">
+      </div>
+      <div class="form-group">
+        <label>Contratada (empresa)</label>
+        <input id="l-mc-contratada" placeholder="Ex: TechSol Ltda — CNPJ 12.345.678/0001-90">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor global (R$)</label>
+        <input id="l-mc-valor" placeholder="Ex: R$ 420.000,00">
+      </div>
+      <div class="form-group">
+        <label>Prazo de vigência</label>
+        <input id="l-mc-prazo" placeholder="Ex: 12 meses, prorrogável até 60 meses">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Modalidade da licitação</label>
+        <select id="l-mc-modalidade">
+          <option value="Pregão Eletrônico">Pregão Eletrônico</option>
+          <option value="Concorrência">Concorrência</option>
+          <option value="Dispensa de Licitação">Dispensa de Licitação</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Número da licitação</label>
+        <input id="l-mc-numero" placeholder="Ex: PE nº 023/2026">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-minuta-contrato')">Gerar Minuta ✦</button>
     </div>
   </div>
 
@@ -1137,6 +1316,39 @@
     } else if (skill === 'assistente-licitacao') {
       body.input = document.getElementById('l-assistente-input').value.trim();
       if (!body.input) { toast('Digite sua dúvida', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-etp') {
+      body.objeto     = document.getElementById('l-etp-objeto').value.trim();
+      body.necessidade = document.getElementById('l-etp-necessidade').value.trim();
+      body.estimativaValor = document.getElementById('l-etp-valor').value.trim();
+      body.prazo      = document.getElementById('l-etp-prazo').value.trim();
+      body.orgao      = document.getElementById('l-etp-orgao').value.trim();
+      if (!body.objeto) { toast('Informe o objeto da contratação', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-tr') {
+      body.objeto     = document.getElementById('l-tr-objeto').value.trim();
+      body.modalidade = document.getElementById('l-tr-modalidade').value;
+      body.criterioJulgamento = document.getElementById('l-tr-criterio').value;
+      body.prazoExecucao = document.getElementById('l-tr-prazo').value.trim();
+      body.valorEstimado = document.getElementById('l-tr-valor').value.trim();
+      if (!body.objeto) { toast('Informe o objeto', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'checklist-sicaf') {
+      body.objeto      = document.getElementById('l-sicaf-objeto').value.trim();
+      body.tipoEmpresa = document.getElementById('l-sicaf-tipo').value;
+      body.modalidade  = document.getElementById('l-sicaf-modal').value;
+    } else if (skill === 'gerar-arp') {
+      body.objeto          = document.getElementById('l-arp-objeto').value.trim();
+      body.orgaoGerenciador = document.getElementById('l-arp-orgao').value.trim();
+      body.validade        = document.getElementById('l-arp-validade').value;
+      body.itens           = document.getElementById('l-arp-itens').value.trim();
+      if (!body.objeto) { toast('Informe o objeto', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-minuta-contrato') {
+      body.objeto       = document.getElementById('l-mc-objeto').value.trim();
+      body.contratante  = document.getElementById('l-mc-contratante').value.trim();
+      body.contratada   = document.getElementById('l-mc-contratada').value.trim();
+      body.valor        = document.getElementById('l-mc-valor').value.trim();
+      body.prazo        = document.getElementById('l-mc-prazo').value.trim();
+      body.modalidade   = document.getElementById('l-mc-modalidade').value;
+      body.numeroLicitacao = document.getElementById('l-mc-numero').value.trim();
+      if (!body.objeto) { toast('Informe o objeto do contrato', 'err'); resultEl.innerHTML = ''; return; }
     }
 
     try {
@@ -1160,13 +1372,50 @@
         </div></div>`; return;
     }
 
+    if (skill === 'checklist-sicaf') {
+      const cats = {};
+      (r.checklist ?? []).forEach(d => {
+        if (!cats[d.categoria]) cats[d.categoria] = [];
+        cats[d.categoria].push(d);
+      });
+      const catsHtml = Object.entries(cats).map(([cat, docs]) => `
+        <h4>${cat}</h4>
+        <ul>${docs.map(d => `<li>
+          <span style="color:${d.obrigatorio ? 'var(--lic)' : 'var(--muted)'}">${d.obrigatorio ? '●' : '○'}</span>
+          <strong>${d.documento}</strong> <span style="color:var(--muted);font-size:.78rem">— ${d.prazo}</span>
+        </li>`).join('')}</ul>`).join('');
+      const instrHtml = (r.instrucoes ?? []).map(i => `<li>${i}</li>`).join('');
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header">
+          <h3>📋 Checklist SICAF</h3>
+          <div class="result-actions">
+            <span class="score-badge score-mid">${r.obrigatorios} obrigatórios / ${r.total} total</span>
+          </div>
+        </div>
+        <div class="result-body">
+          <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">● Obrigatório &nbsp; ○ Condicional</p>
+          ${catsHtml}
+          ${instrHtml ? `<h4>Instruções</h4><ul>${instrHtml}</ul>` : ''}
+          <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Verifique sempre as exigências específicas do edital.'}</div>
+        </div></div>`;
+      toast('Checklist gerado', 'ok'); return;
+    }
+
+    const score = r.validation?.score ?? r._meta?.score;
+    const scoreBadge = score != null
+      ? `<span class="score-badge ${score >= 8 ? 'score-high' : score >= 6 ? 'score-mid' : 'score-low'}">Score ${score}/10</span>`
+      : '';
+
     const secoes = r.secoes ?? r.sections ?? r.clausulas ?? [];
     const sHtml = secoes.map(s => `<h4>${s.titulo ?? s.name ?? ''}</h4><p>${(s.conteudo ?? s.content ?? '').replace(/\n/g,'<br>')}</p>`).join('');
     const legHtml = (r.legislacao_aplicada ?? []).map(l =>
       `<li>${l.lei}${l.artigo ? ' — ' + l.artigo : ''}: ${l.ementa ?? ''}</li>`).join('');
 
     el.innerHTML = `<div class="result-card">
-      <div class="result-header"><h3>📄 ${r.titulo ?? skill}</h3></div>
+      <div class="result-header">
+        <h3>📄 ${r.titulo ?? skill}</h3>
+        <div class="result-actions">${scoreBadge}</div>
+      </div>
       <div class="result-body">
         ${sHtml || `<p>${JSON.stringify(r, null, 2)}</p>`}
         ${legHtml ? `<h4>Legislação Aplicada</h4><ul>${legHtml}</ul>` : ''}

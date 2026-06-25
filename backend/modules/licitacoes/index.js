@@ -1,10 +1,15 @@
-import parseEdital from "./workflows/parseEdital.js";
-import gerarProposta from "./workflows/gerarProposta.js";
-import gerarMemorial from "./workflows/gerarMemorial.js";
-import gerarPlanilha from "./workflows/gerarPlanilha.js";
-import gerarDeclaracao from "./workflows/gerarDeclaracao.js";
+import parseEdital         from "./workflows/parseEdital.js";
+import gerarProposta       from "./workflows/gerarProposta.js";
+import gerarMemorial       from "./workflows/gerarMemorial.js";
+import gerarPlanilha       from "./workflows/gerarPlanilha.js";
+import gerarDeclaracao     from "./workflows/gerarDeclaracao.js";
 import assistenteLicitacao from "./workflows/assistenteLicitacao.js";
-import gerarPDFLicitacao from "./workflows/gerarPDFLicitacao.js";
+import gerarPDFLicitacao   from "./workflows/gerarPDFLicitacao.js";
+import gerarETP            from "./workflows/gerarETP.js";
+import gerarTR             from "./workflows/gerarTR.js";
+import checklistSICAF      from "./workflows/checklistSICAF.js";
+import gerarARP            from "./workflows/gerarARP.js";
+import gerarMinutaContrato from "./workflows/gerarMinutaContrato.js";
 
 export default {
   name: "licitacoes",
@@ -17,5 +22,10 @@ export default {
     "gerar-declaracao":       gerarDeclaracao,
     "assistente-licitacao":   assistenteLicitacao,
     "gerar-pdf-licitacao":    gerarPDFLicitacao,
+    "gerar-etp":              gerarETP,
+    "gerar-tr":               gerarTR,
+    "checklist-sicaf":        checklistSICAF,
+    "gerar-arp":              gerarARP,
+    "gerar-minuta-contrato":  gerarMinutaContrato,
   },
 };

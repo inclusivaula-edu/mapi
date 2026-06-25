@@ -481,20 +481,18 @@ app.post("/ai/juridico", { preHandler: billingGuard }, async (req, reply) => {
 // ── AI: LICITAÇÕES ──────────────────────────────────────────
 app.post("/ai/licitacao", { preHandler: billingGuard }, async (req, reply) => {
   try {
-    const { skill, descricao, editalText, bidProjectId, tipo, docTipo } = req.body ?? {};
+    const body = req.body ?? {};
+    const { skill } = body;
     if (!skill) {
-      return reply.code(400).send({
-        error: "MISSING_INPUT", required: ["skill"],
-        options: ["parse-edital", "gerar-proposta", "gerar-memorial", "gerar-planilha", "gerar-declaracao", "assistente-licitacao", "gerar-pdf-licitacao"],
-      });
+      return reply.code(400).send({ error: "MISSING_INPUT", required: ["skill"] });
     }
 
     const result = await runMAPI({
       moduleName: "licitacoes", workflowName: skill,
-      input: descricao ?? editalText ?? "", modules,
+      input: body.descricao ?? body.editalText ?? body.objeto ?? body.input ?? "", modules,
       context: {
         userId: req.user.id, organizationId: req.tenant.orgId,
-        descricao, editalText, bidProjectId, tipo, docTipo,
+        ...body,
       },
     });
 

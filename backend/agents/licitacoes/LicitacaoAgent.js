@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import { searchLegislacaoLicitacao } from "../../skills/licitacoes/searchLegislacaoLicitacao.js";
 import { validateProposta }          from "../../skills/licitacoes/validateProposta.js";
 import { parseEdital }               from "../../skills/licitacoes/parseEditalSkill.js";
+import { validateETP }               from "../../skills/licitacoes/validateETP.js";
+import { validateTR }                from "../../skills/licitacoes/validateTR.js";
+import { checklistSICAF }            from "../../skills/licitacoes/checklistSICAF.js";
 import { startTrace }                from "../../observability/tracer.js";
 import { recordRequest, recordError, recordLatency, recordTokens } from "../../observability/metrics.js";
 import { logger }                    from "../../observability/logger.js";
@@ -66,26 +69,91 @@ const TOOLS = {
       },
     },
   },
+
+  validar_etp: {
+    handler: ({ etp }) => validateETP(etp),
+    definition: {
+      type: "function",
+      function: {
+        name: "validar_etp",
+        description: "Valida o ETP contra IN SEGES/ME nº 67/2021. Use SEMPRE após gerar o ETP para verificar conformidade.",
+        parameters: {
+          type: "object",
+          properties: {
+            etp: { type: "object", description: "Estudo Técnico Preliminar gerado" },
+          },
+          required: ["etp"],
+        },
+      },
+    },
+  },
+
+  validar_tr: {
+    handler: ({ tr }) => validateTR(tr),
+    definition: {
+      type: "function",
+      function: {
+        name: "validar_tr",
+        description: "Valida o Termo de Referência contra IN SEGES/ME nº 65/2021. Use SEMPRE após gerar o TR.",
+        parameters: {
+          type: "object",
+          properties: {
+            tr: { type: "object", description: "Termo de Referência gerado" },
+          },
+          required: ["tr"],
+        },
+      },
+    },
+  },
+
+  checklist_sicaf: {
+    handler: ({ objeto, tipoEmpresa, modalidade }) => checklistSICAF({ objeto, tipoEmpresa, modalidade }),
+    definition: {
+      type: "function",
+      function: {
+        name: "checklist_sicaf",
+        description: "Gera checklist completo de documentos de habilitação para licitação federal conforme SICAF e Lei 14.133/2021.",
+        parameters: {
+          type: "object",
+          properties: {
+            objeto:      { type: "string", description: "Objeto da licitação" },
+            tipoEmpresa: { type: "string", description: "Tipo: geral | me-epp" },
+            modalidade:  { type: "string", description: "Modalidade: pregao-eletronico | concorrencia | dispensa" },
+          },
+          required: ["objeto"],
+        },
+      },
+    },
+  },
 };
 
 export class LicitacaoAgent {
 
   identity(tipo) {
-    return `Você é Dr. Roberto, especialista em licitações públicas brasileiras com 15 anos de experiência.
-Sua especialidade: Nova Lei de Licitações (Lei 14.133/2021), Lei 8.666/1993, pregão eletrônico, propostas técnicas e documentação de habilitação.
+    return `Você é Dr. Roberto, especialista em licitações públicas federais com 15 anos de experiência no gov.br/compras.
+Sua especialidade: Lei 14.133/2021, Decreto 10.024/2019, IN SEGES 65/2021 (TR), IN SEGES 67/2021 (ETP), SICAF, PNCP, SRP/ARP (Decreto 11.462/2023), pregão eletrônico, TCU.
+
+Ferramentas disponíveis e quando usar:
+- parse_edital: SEMPRE que receber texto de edital
+- buscar_legislacao_licitacao: SEMPRE antes de gerar qualquer documento
+- validar_proposta: SEMPRE após gerar proposta técnica
+- validar_etp: SEMPRE após gerar ETP (verifica conformidade com IN SEGES 67/2021)
+- validar_tr: SEMPRE após gerar TR (verifica conformidade com IN SEGES 65/2021)
+- checklist_sicaf: quando o usuário precisar de lista de documentos de habilitação
 
 Seu processo OBRIGATÓRIO para gerar ${tipo}:
 1. Se receber texto de edital, use parse_edital para extrair requisitos
 2. Busque legislação aplicável com buscar_legislacao_licitacao
-3. Redija o documento ${tipo} seguindo rigorosamente os requisitos do edital
-4. Valide com validar_proposta — se score < 7, reescreva as partes deficientes
+3. Redija o documento ${tipo} seguindo rigorosamente as normas federais
+4. Valide com a ferramenta de validação correspondente — se score < 7, reescreva
 
 REGRAS INVIOLÁVEIS:
-- Todo documento deve referenciar os artigos da Lei 14.133/2021 aplicáveis
-- Propostas devem atender TODOS os requisitos de habilitação do edital
-- Declarações devem seguir os modelos oficiais
-- Memorial descritivo deve detalhar metodologia, cronograma e equipe técnica
-- Planilha de preços deve incluir BDI, encargos sociais e composição de custos
+- Todo documento referencia os artigos da Lei 14.133/2021 e normas aplicáveis
+- ETP deve seguir IN SEGES 67/2021, TR deve seguir IN SEGES 65/2021
+- Pregão eletrônico segue Decreto 10.024/2019
+- ARP segue Decreto 11.462/2023
+- Declarações seguem modelos oficiais do PNCP/ComprasNet
+- Planilha de preços inclui BDI, encargos sociais e pesquisa no Painel de Preços gov.br
 - Inclua disclaimer de revisão profissional
 
 FORMATO DE SAÍDA FINAL (JSON puro, sem markdown):

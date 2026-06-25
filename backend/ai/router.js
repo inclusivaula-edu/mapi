@@ -23,7 +23,7 @@ const SKILL_MAP = {
   "assistente-juridico":      { moduleName: "juridico", workflowName: "assistente-juridico" },
   "gerar-pdf-juridico":       { moduleName: "juridico", workflowName: "gerar-pdf-juridico" },
 
-  // ── licitacoes (7) ───────────────────────────────────────────
+  // ── licitacoes (12) ──────────────────────────────────────────
   "parse-edital":             { moduleName: "licitacoes", workflowName: "parse-edital" },
   "gerar-proposta":           { moduleName: "licitacoes", workflowName: "gerar-proposta" },
   "gerar-memorial":           { moduleName: "licitacoes", workflowName: "gerar-memorial" },
@@ -31,6 +31,11 @@ const SKILL_MAP = {
   "gerar-declaracao":         { moduleName: "licitacoes", workflowName: "gerar-declaracao" },
   "assistente-licitacao":     { moduleName: "licitacoes", workflowName: "assistente-licitacao" },
   "gerar-pdf-licitacao":      { moduleName: "licitacoes", workflowName: "gerar-pdf-licitacao" },
+  "gerar-etp":                { moduleName: "licitacoes", workflowName: "gerar-etp" },
+  "gerar-tr":                 { moduleName: "licitacoes", workflowName: "gerar-tr" },
+  "checklist-sicaf":          { moduleName: "licitacoes", workflowName: "checklist-sicaf" },
+  "gerar-arp":                { moduleName: "licitacoes", workflowName: "gerar-arp" },
+  "gerar-minuta-contrato":    { moduleName: "licitacoes", workflowName: "gerar-minuta-contrato" },
 
   // ── lgpd (8) ─────────────────────────────────────────────────
   "diagnostico-lgpd":           { moduleName: "lgpd", workflowName: "diagnostico-lgpd" },
@@ -87,12 +92,17 @@ function keywordRoute(input) {
   if (t.includes("jurídic") || t.includes("juridic"))                            return SKILL_MAP["assistente-juridico"];
 
   // licitacoes
+  if (t.includes("estudo técnico") || t.includes("estudo tecnico") || t.includes(" etp"))           return SKILL_MAP["gerar-etp"];
+  if (t.includes("termo de referência") || t.includes("termo de referencia") || (t.includes(" tr ") && t.includes("licitaç"))) return SKILL_MAP["gerar-tr"];
+  if (t.includes("sicaf") || t.includes("habilitaç") || t.includes("checklist"))                    return SKILL_MAP["checklist-sicaf"];
+  if (t.includes("ata de registro") || t.includes(" arp") || t.includes("registro de preço"))       return SKILL_MAP["gerar-arp"];
+  if (t.includes("minuta de contrato") || t.includes("contrato administrativo"))                     return SKILL_MAP["gerar-minuta-contrato"];
   if (t.includes("edital"))                                                      return SKILL_MAP["parse-edital"];
   if (t.includes("proposta técnica") || t.includes("proposta tecnica"))          return SKILL_MAP["gerar-proposta"];
   if (t.includes("memorial"))                                                    return SKILL_MAP["gerar-memorial"];
   if (t.includes("planilha") && t.includes("preço"))                             return SKILL_MAP["gerar-planilha"];
   if (t.includes("declaraç") || t.includes("declarac"))                          return SKILL_MAP["gerar-declaracao"];
-  if (t.includes("licitaç") || t.includes("licitac") || t.includes("pregão") || t.includes("pregao") || t.includes("14.133")) return SKILL_MAP["assistente-licitacao"];
+  if (t.includes("licitaç") || t.includes("licitac") || t.includes("pregão") || t.includes("pregao") || t.includes("14.133") || t.includes("pncp") || t.includes("comprasnet")) return SKILL_MAP["assistente-licitacao"];
 
   // lgpd
   if (t.includes("diagnóstico lgpd") || t.includes("diagnostico lgpd") || t.includes("maturidade lgpd")) return SKILL_MAP["diagnostico-lgpd"];
