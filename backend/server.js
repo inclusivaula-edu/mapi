@@ -93,7 +93,10 @@ if (fs.existsSync(frontendPath)) {
     root:   frontendPath,
     prefix: "/",
   });
-  app.setNotFoundHandler((_req, reply) => {
+  app.setNotFoundHandler((req, reply) => {
+    if (req.url.startsWith("/api/") || req.url.startsWith("/ai/") || req.url.startsWith("/auth/") || req.url.startsWith("/webhooks/")) {
+      return reply.code(404).send({ error: "NOT_FOUND", path: req.url });
+    }
     reply.sendFile("index.html");
   });
   app.log.info({ message: "Frontend estático servido em /" });
