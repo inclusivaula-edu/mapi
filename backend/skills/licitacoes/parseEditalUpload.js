@@ -1,4 +1,6 @@
-import pdf from "pdf-parse";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const pdf = require("pdf-parse");
 import { logger } from "../../observability/logger.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

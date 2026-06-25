@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { extractJson } from "../../utils/extractJson.js";
 import { searchLegislacaoLicitacao } from "../../skills/licitacoes/searchLegislacaoLicitacao.js";
 import { validateProposta }          from "../../skills/licitacoes/validateProposta.js";
 import { parseEdital }               from "../../skills/licitacoes/parseEditalSkill.js";
@@ -294,7 +295,8 @@ FORMATO DE SAÍDA FINAL (JSON puro, sem markdown):
       const raw = messages[messages.length - 1]?.content ?? "";
       let documento;
       try {
-        documento = JSON.parse(raw.replace(/```json|```/g, "").trim());
+        documento = extractJson(raw);
+        if (!documento) throw new Error("parse failed");
       } catch {
         throw new Error(`LicitacaoAgent: resposta não é JSON válido. Raw: ${raw.slice(0, 300)}`);
       }

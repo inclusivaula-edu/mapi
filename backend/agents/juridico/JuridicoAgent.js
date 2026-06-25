@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { extractJson } from "../../utils/extractJson.js";
 import { searchLegislacao }    from "../../skills/juridico/searchLegislacao.js";
 import { searchJurisprudencia } from "../../skills/juridico/searchJurisprudencia.js";
 import { validateJuridico }    from "../../skills/juridico/validateJuridico.js";
@@ -214,7 +215,8 @@ Siga o processo obrigatório: busque a legislação, jurisprudência se necessá
       const raw = messages[messages.length - 1]?.content ?? "";
       let documento;
       try {
-        documento = JSON.parse(raw.replace(/```json|```/g, "").trim());
+        documento = extractJson(raw);
+        if (!documento) throw new Error("parse failed");
       } catch {
         throw new Error(`JuridicoAgent: resposta não é JSON válido. Raw: ${raw.slice(0, 300)}`);
       }

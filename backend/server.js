@@ -90,9 +90,8 @@ await app.register(cors, {
 const frontendPath = path.join(__dirname, "../frontend");
 if (fs.existsSync(frontendPath)) {
   await app.register(staticFiles, {
-    root:          frontendPath,
-    prefix:        "/",
-    decorateReply: false,
+    root:   frontendPath,
+    prefix: "/",
   });
   app.setNotFoundHandler((_req, reply) => {
     reply.sendFile("index.html");

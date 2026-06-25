@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { extractJson } from "../../utils/extractJson.js";
 import { searchLGPDLegislation } from "../../skills/lgpd/searchLGPDLegislation.js";
 import { diagnoseMaturity }      from "../../skills/lgpd/diagnoseMaturity.js";
 import { validateCompliance }    from "../../skills/lgpd/validateCompliance.js";
@@ -171,7 +172,8 @@ FORMATO DE SAÍDA FINAL (JSON puro, sem markdown):
       const raw = messages[messages.length - 1]?.content ?? "";
       let documento;
       try {
-        documento = JSON.parse(raw.replace(/```json|```/g, "").trim());
+        documento = extractJson(raw);
+        if (!documento) throw new Error("parse failed");
       } catch {
         throw new Error(`LGPDAgent: resposta não é JSON válido. Raw: ${raw.slice(0, 300)}`);
       }

@@ -1999,12 +1999,17 @@
   }
 
   // ── API FETCH ──────────────────────────────────────────────
-  async function apiFetch(endpoint, body) {
-    const res = await fetch(API + endpoint, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body:    JSON.stringify(body),
-    });
+  async function apiFetch(endpoint, body, method) {
+    const m = method ?? (body != null ? 'POST' : 'GET');
+    const opts = {
+      method: m,
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    if (body != null) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(API + endpoint, opts);
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail ?? data.error ?? `Erro ${res.status}`);
     return data;
