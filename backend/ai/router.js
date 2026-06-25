@@ -36,6 +36,8 @@ const SKILL_MAP = {
   "checklist-sicaf":          { moduleName: "licitacoes", workflowName: "checklist-sicaf" },
   "gerar-arp":                { moduleName: "licitacoes", workflowName: "gerar-arp" },
   "gerar-minuta-contrato":    { moduleName: "licitacoes", workflowName: "gerar-minuta-contrato" },
+  "buscar-editais":           { moduleName: "licitacoes", workflowName: "buscar-editais" },
+  "pesquisar-precos":         { moduleName: "licitacoes", workflowName: "pesquisar-precos" },
 
   // ── lgpd (8) ─────────────────────────────────────────────────
   "diagnostico-lgpd":           { moduleName: "lgpd", workflowName: "diagnostico-lgpd" },
@@ -97,6 +99,8 @@ function keywordRoute(input) {
   if (t.includes("sicaf") || t.includes("habilitaç") || t.includes("checklist"))                    return SKILL_MAP["checklist-sicaf"];
   if (t.includes("ata de registro") || t.includes(" arp") || t.includes("registro de preço"))       return SKILL_MAP["gerar-arp"];
   if (t.includes("minuta de contrato") || t.includes("contrato administrativo"))                     return SKILL_MAP["gerar-minuta-contrato"];
+  if (t.includes("buscar edital") || t.includes("buscar editais") || t.includes("oportunidade")) return SKILL_MAP["buscar-editais"];
+  if (t.includes("preço referência") || t.includes("preco referencia") || t.includes("pesquisa de preço") || t.includes("painel de preço")) return SKILL_MAP["pesquisar-precos"];
   if (t.includes("edital"))                                                      return SKILL_MAP["parse-edital"];
   if (t.includes("proposta técnica") || t.includes("proposta tecnica"))          return SKILL_MAP["gerar-proposta"];
   if (t.includes("memorial"))                                                    return SKILL_MAP["gerar-memorial"];

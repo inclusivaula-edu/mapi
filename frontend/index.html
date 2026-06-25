@@ -529,6 +529,8 @@
     <button class="skill-tab" onclick="setSkill('lic','checklist-sicaf',this)">SICAF</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-arp',this)">ARP</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-minuta-contrato',this)">Minuta Contrato</button>
+    <button class="skill-tab" onclick="setSkill('lic','buscar-editais',this)">🔍 Buscar Editais</button>
+    <button class="skill-tab" onclick="setSkill('lic','pesquisar-precos',this)">💰 Preços Referência</button>
     <button class="skill-tab" onclick="setSkill('lic','assistente-licitacao',this)">Assistente</button>
     <button class="skill-tab" onclick="setSkill('lic','minha-empresa',this)">Minha Empresa</button>
     <button class="skill-tab" onclick="setSkill('lic','historico-licitacoes',this)">Histórico</button>
@@ -841,6 +843,60 @@
     <div class="submit-row">
       <button class="btn btn-lic" onclick="submitLic('gerar-minuta-contrato')">Gerar Minuta ✦</button>
     </div>
+  </div>
+
+  <!-- Buscar Editais PNCP -->
+  <div id="lic-form-buscar-editais" class="form-card" style="display:none">
+    <h3 style="margin-bottom:.5rem;font-family:'Syne',sans-serif;font-size:1rem">🔍 Buscar Editais no PNCP</h3>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">Busca em tempo real no Portal Nacional de Contratações Públicas (dados oficiais gov.br).</p>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label>Palavra-chave *</label>
+        <input id="pncp-keyword" placeholder="Ex: tecnologia, material hospitalar, construção civil">
+      </div>
+      <div class="form-group">
+        <label>Modalidade</label>
+        <select id="pncp-modalidade">
+          <option value="6">Pregão Eletrônico</option>
+          <option value="2">Concorrência</option>
+          <option value="8">Dispensa</option>
+          <option value="9">Inexigibilidade</option>
+          <option value="5">Diálogo Competitivo</option>
+          <option value="10">Credenciamento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>UF</label>
+        <select id="pncp-uf">
+          <option value="">Todas</option>
+          <option>AC</option><option>AL</option><option>AM</option><option>AP</option>
+          <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+          <option>GO</option><option>MA</option><option>MG</option><option>MS</option>
+          <option>MT</option><option>PA</option><option>PB</option><option>PE</option>
+          <option>PI</option><option>PR</option><option>RJ</option><option>RN</option>
+          <option>RO</option><option>RR</option><option>RS</option><option>SC</option>
+          <option>SE</option><option>SP</option><option>TO</option>
+        </select>
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="searchPNCPEditais()">Buscar no PNCP ✦</button>
+    </div>
+    <div id="pncp-editais-result"></div>
+  </div>
+
+  <!-- Pesquisa de Preços PNCP -->
+  <div id="lic-form-pesquisar-precos" class="form-card" style="display:none">
+    <h3 style="margin-bottom:.5rem;font-family:'Syne',sans-serif;font-size:1rem">💰 Pesquisa de Preços de Referência</h3>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">Preços reais de contratações homologadas no PNCP (últimos 6 meses). Substitui pesquisa no Painel de Preços.</p>
+    <div class="form-group">
+      <label>Objeto / Palavra-chave *</label>
+      <input id="pncp-preco-keyword" placeholder="Ex: notebook, serviço de limpeza, licença software">
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="searchPNCPPrecos()">Pesquisar Preços ✦</button>
+    </div>
+    <div id="pncp-precos-result"></div>
   </div>
 
   <!-- Minha Empresa -->
@@ -1480,6 +1536,80 @@
         <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Este documento foi gerado por IA. Revise com advogado habilitado antes de usar.'}</div>
       </div></div>`;
     toast('Documento gerado', 'ok');
+  }
+
+  // ── PNCP SEARCH ───────────────────────────────────────────
+  async function searchPNCPEditais(pagina = 1) {
+    const keyword = document.getElementById('pncp-keyword').value.trim();
+    if (!keyword) { toast('Digite uma palavra-chave', 'err'); return; }
+    const resultEl = document.getElementById('pncp-editais-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Consultando PNCP...</div>';
+    try {
+      const modalidade = document.getElementById('pncp-modalidade').value;
+      const uf = document.getElementById('pncp-uf').value;
+      const params = new URLSearchParams({ palavraChave: keyword, modalidade, pagina });
+      if (uf) params.set('uf', uf);
+      const res = await apiFetch('/api/pncp/editais?' + params, null, 'GET');
+      const { editais, total, totalPaginas } = res;
+      if (!editais?.length) { resultEl.innerHTML = '<p style="color:var(--muted)">Nenhum edital encontrado.</p>'; return; }
+      const header = `<div style="margin-bottom:.8rem;font-size:.85rem;color:var(--muted)">${total.toLocaleString('pt-BR')} editais encontrados (página ${pagina} de ${totalPaginas})</div>`;
+      const cards = editais.map(e => {
+        const prazo = e.dataEncerramento ? new Date(e.dataEncerramento) : null;
+        const vencido = prazo && prazo < new Date();
+        const prazoStr = prazo ? prazo.toLocaleDateString('pt-BR') + (vencido ? ' (encerrado)' : '') : 'Sem prazo';
+        return `<div style="padding:.8rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;background:var(--surface)">
+          <div style="font-weight:600;font-size:.9rem;margin-bottom:.3rem">${e.objeto?.slice(0,150) ?? '—'}</div>
+          <div style="font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:.5rem">
+            <span>🏛️ ${e.orgao ?? '—'}</span>
+            <span>📍 ${e.municipio ?? ''}/${e.uf ?? ''}</span>
+            <span>📋 ${e.modalidade ?? ''}</span>
+          </div>
+          <div style="font-size:.8rem;display:flex;flex-wrap:wrap;gap:.8rem;margin-top:.4rem">
+            <span>💰 Estimado: <strong>R$ ${(e.valorEstimado ?? 0).toLocaleString('pt-BR')}</strong></span>
+            ${e.valorHomologado ? `<span>✅ Homologado: <strong>R$ ${e.valorHomologado.toLocaleString('pt-BR')}</strong></span>` : ''}
+            <span style="color:${vencido ? 'var(--danger)' : 'var(--edu)'}">⏰ ${prazoStr}</span>
+          </div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">PNCP: ${e.id ?? ''} | Processo: ${e.processo ?? ''} | ${e.situacao ?? ''}</div>
+        </div>`;
+      }).join('');
+      const nav = totalPaginas > 1 ? `<div style="display:flex;gap:.5rem;justify-content:center;margin-top:.8rem">
+        ${pagina > 1 ? `<button class="btn btn-ghost btn-sm" onclick="searchPNCPEditais(${pagina - 1})">← Anterior</button>` : ''}
+        ${pagina < totalPaginas ? `<button class="btn btn-ghost btn-sm" onclick="searchPNCPEditais(${pagina + 1})">Próxima →</button>` : ''}
+      </div>` : '';
+      resultEl.innerHTML = header + cards + nav;
+    } catch (err) { resultEl.innerHTML = `<p style="color:var(--danger)">${err.message}</p>`; }
+  }
+
+  async function searchPNCPPrecos() {
+    const keyword = document.getElementById('pncp-preco-keyword').value.trim();
+    if (!keyword) { toast('Digite o objeto para pesquisa', 'err'); return; }
+    const resultEl = document.getElementById('pncp-precos-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Pesquisando preços no PNCP...</div>';
+    try {
+      const res = await apiFetch('/api/pncp/precos?palavraChave=' + encodeURIComponent(keyword), null, 'GET');
+      const { precos, stats } = res;
+      if (!precos?.length) { resultEl.innerHTML = '<p style="color:var(--muted)">Nenhum preço encontrado para esse objeto.</p>'; return; }
+      const statsHtml = stats ? `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1rem">
+        <h4 style="font-size:.9rem;margin-bottom:.5rem;font-family:'Syne',sans-serif">Estatísticas de Preço (${stats.total} contratações)</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:1.2rem;font-size:.85rem">
+          <div>Média: <strong style="color:var(--edu)">R$ ${stats.media?.toLocaleString('pt-BR')}</strong></div>
+          <div>Mediana: <strong>R$ ${stats.mediana?.toLocaleString('pt-BR')}</strong></div>
+          <div>Mínimo: <strong style="color:var(--edu)">R$ ${stats.minimo?.toLocaleString('pt-BR')}</strong></div>
+          <div>Máximo: <strong style="color:var(--danger)">R$ ${stats.maximo?.toLocaleString('pt-BR')}</strong></div>
+          <div>Desconto médio: <strong>${stats.descontoMedio}%</strong></div>
+        </div>
+      </div>` : '';
+      const rows = precos.map(p => `<div style="padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.83rem">
+        <div style="font-weight:500">${p.objeto ?? '—'}</div>
+        <div style="color:var(--muted)">${p.orgao ?? '—'} (${p.uf ?? ''}) — ${p.modalidade ?? ''} — ${p.data ?? ''}</div>
+        <div style="display:flex;gap:1rem;margin-top:.2rem">
+          <span>Estimado: R$ ${(p.valorEstimado ?? 0).toLocaleString('pt-BR')}</span>
+          <span style="color:var(--edu)">Homologado: <strong>R$ ${(p.valorHomologado ?? 0).toLocaleString('pt-BR')}</strong></span>
+          ${p.desconto != null ? `<span style="color:${p.desconto > 0 ? 'var(--edu)' : 'var(--danger)'}">Desconto: ${p.desconto}%</span>` : ''}
+        </div>
+      </div>`).join('');
+      resultEl.innerHTML = statsHtml + '<div style="max-height:400px;overflow-y:auto">' + rows + '</div>';
+    } catch (err) { resultEl.innerHTML = `<p style="color:var(--danger)">${err.message}</p>`; }
   }
 
   // ── UPLOAD EDITAL ──────────────────────────────────────────

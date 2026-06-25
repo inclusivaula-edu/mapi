@@ -5,6 +5,7 @@ import { parseEdital }               from "../../skills/licitacoes/parseEditalSk
 import { validateETP }               from "../../skills/licitacoes/validateETP.js";
 import { validateTR }                from "../../skills/licitacoes/validateTR.js";
 import { checklistSICAF }            from "../../skills/licitacoes/checklistSICAF.js";
+import { searchPNCP, searchPrecosReferencia } from "../../skills/licitacoes/searchPNCP.js";
 import { getCompanyProfile, injectCompanyContext } from "../../skills/licitacoes/companyProfile.js";
 import { getBidHistory, getBidStats, injectHistoryContext } from "../../skills/licitacoes/bidHistory.js";
 import { startTrace }                from "../../observability/tracer.js";
@@ -127,6 +128,44 @@ const TOOLS = {
       },
     },
   },
+
+  buscar_editais_pncp: {
+    handler: ({ palavraChave, modalidade, uf }) => searchPNCP({ palavraChave, modalidade, uf }),
+    definition: {
+      type: "function",
+      function: {
+        name: "buscar_editais_pncp",
+        description: "Busca editais publicados no PNCP (Portal Nacional de Contratações Públicas) em tempo real. Use para encontrar oportunidades de licitação.",
+        parameters: {
+          type: "object",
+          properties: {
+            palavraChave: { type: "string", description: "Termo de busca (ex: tecnologia, material hospitalar)" },
+            modalidade:   { type: "string", description: "pregao-eletronico | concorrencia | dispensa | inexigibilidade" },
+            uf:           { type: "string", description: "Sigla do estado (ex: SP, RJ, DF)" },
+          },
+          required: ["palavraChave"],
+        },
+      },
+    },
+  },
+
+  pesquisar_precos_pncp: {
+    handler: ({ palavraChave }) => searchPrecosReferencia({ palavraChave }),
+    definition: {
+      type: "function",
+      function: {
+        name: "pesquisar_precos_pncp",
+        description: "Pesquisa preços de referência no PNCP baseado em contratações homologadas. Use SEMPRE ao gerar planilhas de preços ou propostas para ter dados reais de mercado.",
+        parameters: {
+          type: "object",
+          properties: {
+            palavraChave: { type: "string", description: "Termo de busca para encontrar contratações similares" },
+          },
+          required: ["palavraChave"],
+        },
+      },
+    },
+  },
 };
 
 export class LicitacaoAgent {
@@ -142,12 +181,15 @@ Ferramentas disponíveis e quando usar:
 - validar_etp: SEMPRE após gerar ETP (verifica conformidade com IN SEGES 67/2021)
 - validar_tr: SEMPRE após gerar TR (verifica conformidade com IN SEGES 65/2021)
 - checklist_sicaf: quando o usuário precisar de lista de documentos de habilitação
+- buscar_editais_pncp: busca editais publicados no PNCP em tempo real — use para encontrar oportunidades
+- pesquisar_precos_pncp: busca preços de referência de contratações homologadas — use SEMPRE ao gerar planilhas de preços ou propostas para basear em dados reais de mercado
 
 Seu processo OBRIGATÓRIO para gerar ${tipo}:
 1. Se receber texto de edital, use parse_edital para extrair requisitos
 2. Busque legislação aplicável com buscar_legislacao_licitacao
-3. Redija o documento ${tipo} seguindo rigorosamente as normas federais
-4. Valide com a ferramenta de validação correspondente — se score < 7, reescreva
+3. Se for proposta ou planilha de preços, use pesquisar_precos_pncp para obter dados reais de mercado
+4. Redija o documento ${tipo} seguindo rigorosamente as normas federais, usando dados reais quando disponíveis
+5. Valide com a ferramenta de validação correspondente — se score < 7, reescreva
 
 REGRAS INVIOLÁVEIS:
 - Todo documento referencia os artigos da Lei 14.133/2021 e normas aplicáveis

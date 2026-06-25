@@ -633,6 +633,31 @@ app.post("/ai/lgpd", { preHandler: billingGuard }, async (req, reply) => {
   }
 });
 
+// ── PNCP: Busca de editais e preços ────────────────────────
+import { searchPNCP, searchPrecosReferencia } from "./skills/licitacoes/searchPNCP.js";
+
+app.get("/api/pncp/editais", { preHandler: billingGuard }, async (req, reply) => {
+  try {
+    const { palavraChave, modalidade, uf, pagina } = req.query;
+    if (!palavraChave?.trim()) return reply.code(400).send({ error: "palavraChave é obrigatório" });
+    const result = await searchPNCP({ palavraChave, modalidade, uf, pagina: Number(pagina) || 1 });
+    return reply.send(result);
+  } catch (err) {
+    return reply.code(502).send({ error: "Falha ao consultar PNCP: " + err.message });
+  }
+});
+
+app.get("/api/pncp/precos", { preHandler: billingGuard }, async (req, reply) => {
+  try {
+    const { palavraChave } = req.query;
+    if (!palavraChave?.trim()) return reply.code(400).send({ error: "palavraChave é obrigatório" });
+    const result = await searchPrecosReferencia({ palavraChave });
+    return reply.send(result);
+  } catch (err) {
+    return reply.code(502).send({ error: "Falha ao consultar preços: " + err.message });
+  }
+});
+
 // ── UPLOAD EDITAL ───────────────────────────────────────────
 import { parseEditalFromBuffer } from "./skills/licitacoes/parseEditalUpload.js";
 

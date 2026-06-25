@@ -10,6 +10,8 @@ import gerarTR             from "./workflows/gerarTR.js";
 import checklistSICAF      from "./workflows/checklistSICAF.js";
 import gerarARP            from "./workflows/gerarARP.js";
 import gerarMinutaContrato from "./workflows/gerarMinutaContrato.js";
+import buscarEditais       from "./workflows/buscarEditais.js";
+import pesquisarPrecos     from "./workflows/pesquisarPrecos.js";
 
 export default {
   name: "licitacoes",
@@ -27,5 +29,7 @@ export default {
     "checklist-sicaf":        checklistSICAF,
     "gerar-arp":              gerarARP,
     "gerar-minuta-contrato":  gerarMinutaContrato,
+    "buscar-editais":         buscarEditais,
+    "pesquisar-precos":       pesquisarPrecos,
   },
 };
