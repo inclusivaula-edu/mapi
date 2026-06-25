@@ -5,6 +5,7 @@ import cors           from "@fastify/cors";
 import staticFiles    from "@fastify/static";
 import helmet         from "@fastify/helmet";
 import rateLimit      from "@fastify/rate-limit";
+import multipart      from "@fastify/multipart";
 import fs             from "fs";
 import path           from "path";
 import { fileURLToPath } from "url";
@@ -629,6 +630,32 @@ app.post("/ai/lgpd", { preHandler: billingGuard }, async (req, reply) => {
   } catch (err) {
     app.log.error({ route: "/ai/lgpd", err: err.message });
     return reply.code(500).send({ error: "LGPD_ERROR", ...(isDev && { detail: err.message }) });
+  }
+});
+
+// ── UPLOAD EDITAL ───────────────────────────────────────────
+import { parseEditalFromBuffer } from "./skills/licitacoes/parseEditalUpload.js";
+
+await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
+
+app.post("/api/upload-edital", { preHandler: billingGuard }, async (req, reply) => {
+  try {
+    const file = await req.file();
+    if (!file) return reply.code(400).send({ error: "Nenhum arquivo enviado" });
+
+    const buffer = await file.toBuffer();
+    const result = await parseEditalFromBuffer(buffer, file.mimetype, file.filename);
+
+    return reply.send({
+      text: result.text,
+      pages: result.pages,
+      filename: result.filename,
+      method: result.method,
+      chars: result.text.length,
+    });
+  } catch (err) {
+    app.log.error({ route: "/api/upload-edital", err: err.message });
+    return reply.code(400).send({ error: err.message });
   }
 });
 

@@ -537,7 +537,14 @@
   <!-- Parse Edital -->
   <div id="lic-form-parse-edital" class="form-card">
     <div class="form-group">
-      <label>Cole o texto do edital</label>
+      <label>Cole o texto do edital ou envie um PDF</label>
+      <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+          📎 Upload PDF/TXT
+          <input type="file" id="l-edital-file" accept=".pdf,.txt" style="display:none" onchange="uploadEdital()">
+        </label>
+        <span id="l-edital-upload-status" style="font-size:.8rem;color:var(--muted);align-self:center"></span>
+      </div>
       <textarea id="l-edital-text" rows="8" placeholder="Cole aqui o texto do edital de licitação para análise..."></textarea>
     </div>
     <div class="submit-row">
@@ -549,6 +556,13 @@
   <div id="lic-form-gerar-proposta" class="form-card" style="display:none">
     <div class="form-group">
       <label>Requisitos do edital (ou cole o edital)</label>
+      <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+          📎 Upload PDF/TXT
+          <input type="file" accept=".pdf,.txt" style="display:none" onchange="uploadEditalTo(this,'l-proposta-edital','l-proposta-upload-status')">
+        </label>
+        <span id="l-proposta-upload-status" style="font-size:.8rem;color:var(--muted);align-self:center"></span>
+      </div>
       <textarea id="l-proposta-edital" rows="4" placeholder="Cole os requisitos técnicos do edital..."></textarea>
     </div>
     <div class="form-row">
@@ -1466,6 +1480,37 @@
         <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Este documento foi gerado por IA. Revise com advogado habilitado antes de usar.'}</div>
       </div></div>`;
     toast('Documento gerado', 'ok');
+  }
+
+  // ── UPLOAD EDITAL ──────────────────────────────────────────
+  async function uploadEditalTo(fileInput, textareaId, statusId) {
+    const statusEl = document.getElementById(statusId);
+    const file = fileInput.files[0];
+    if (!file) return;
+    statusEl.textContent = 'Enviando...';
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/upload-edital', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token },
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro no upload');
+      document.getElementById(textareaId).value = data.text;
+      statusEl.textContent = `✓ ${data.filename} (${data.pages} pág, ${data.chars.toLocaleString()} chars)`;
+    } catch (err) {
+      statusEl.textContent = '✗ ' + err.message;
+      toast(err.message, 'err');
+    }
+    fileInput.value = '';
+  }
+
+  function uploadEdital() {
+    const input = document.getElementById('l-edital-file');
+    uploadEditalTo(input, 'l-edital-text', 'l-edital-upload-status');
   }
 
   // ── LICITAÇÕES ─────────────────────────────────────────────
