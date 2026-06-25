@@ -4,6 +4,7 @@ import { searchDiagnosis } from "../skills/searchDiagnosis.js";
 import { searchBNCC } from "../skills/searchBNCC.js";
 import { logUsage } from "../billing/ledger.engine.js";
 import { supabase } from "../services/dbService.js";
+import { getStudentHistory, saveStudentSnapshot } from "../skills/studentHistory.js";
 
 /**
  * PEI ORCHESTRATOR — Subagentes em paralelo para relatório PEI completo
@@ -41,7 +42,7 @@ Retorne APENAS JSON puro:
   "content": "texto detalhado da seção"
 }`,
       user: `ALUNO: ${JSON.stringify(student)}
-ESTRATÉGIAS DO DIAGNÓSTICO: ${JSON.stringify(strategies)}
+ESTRATÉGIAS DO DIAGNÓSTICO: ${JSON.stringify(strategies)}${student._history ?? ""}
 Escreva a seção de Diagnóstico e Perfil Funcional do PEI.`,
       temperature: 0.3,
     }).then((raw) => JSON.parse(raw.replace(/```json|```/g, "").trim()));
@@ -54,13 +55,14 @@ Escreva a seção de Diagnóstico e Perfil Funcional do PEI.`,
     return chat({
       system: `Você define objetivos pedagógicos de curto, médio e longo prazo para um PEI.
 Use os códigos BNCC quando relevante. Seja específico e mensurável (critérios SMART).
+Se houver histórico de semestres anteriores, REFERENCIE os objetivos passados e indique quais foram atingidos.
 Retorne APENAS JSON puro:
 {
   "name": "Objetivos Pedagógicos",
   "content": "texto detalhado com objetivos de curto, médio e longo prazo"
 }`,
       user: `ALUNO: ${JSON.stringify(student)}
-BNCC RELEVANTE: ${JSON.stringify(bncc)}
+BNCC RELEVANTE: ${JSON.stringify(bncc)}${student._history ?? ""}
 Defina os objetivos pedagógicos do PEI.`,
       temperature: 0.3,
     }).then((raw) => JSON.parse(raw.replace(/```json|```/g, "").trim()));
@@ -79,8 +81,8 @@ Retorne APENAS JSON puro:
   "content": "texto detalhado com estratégias e adaptações"
 }`,
       user: `ALUNO: ${JSON.stringify(student)}
-ESTRATÉGIAS DO DIAGNÓSTICO: ${JSON.stringify(strategies)}
-Defina estratégias e adaptações curriculares do PEI.`,
+ESTRATÉGIAS DO DIAGNÓSTICO: ${JSON.stringify(strategies)}${student._history ?? ""}
+Defina estratégias e adaptações curriculares do PEI. Se houver histórico, indique quais estratégias foram eficazes e quais precisam ser ajustadas.`,
       temperature: 0.3,
     }).then((raw) => JSON.parse(raw.replace(/```json|```/g, "").trim()));
   }
@@ -138,12 +140,24 @@ Integre as seções em um PEI completo e coeso.`,
   async run({ student, context }) {
     const startTime = Date.now();
 
+    // ── HISTÓRICO: busca evolução de semestres anteriores ─────────────────
+    let studentHistory = [];
+    if (student.id && context.organizationId) {
+      studentHistory = await getStudentHistory(student.id, context.organizationId);
+    }
+    const historyContext = studentHistory.length > 0
+      ? `\n\nHISTÓRICO DO ALUNO (semestres anteriores):\n${JSON.stringify(studentHistory.slice(0, 4), null, 2)}`
+      : "";
+
+    // Injeta histórico no perfil do aluno para os subagentes
+    const enrichedStudent = { ...student, _history: historyContext };
+
     // ── FORK: 4 subagentes rodando em paralelo ────────────────────────────
     const [diagnostico, objetivos, estrategias, avaliacao] = await Promise.all([
-      this.runDiagnosticoAgent({ student }),
-      this.runObjetivosAgent({ student }),
-      this.runEstrategiasAgent({ student }),
-      this.runAvaliacaoAgent({ student }),
+      this.runDiagnosticoAgent({ student: enrichedStudent }),
+      this.runObjetivosAgent({ student: enrichedStudent }),
+      this.runEstrategiasAgent({ student: enrichedStudent }),
+      this.runAvaliacaoAgent({ student: enrichedStudent }),
     ]);
 
     // ── JOIN: síntese integra os 4 resultados ─────────────────────────────
@@ -156,12 +170,32 @@ Integre as seções em um PEI completo e coeso.`,
 
     // Persiste o PEI em background
     supabase.from("reports").insert({
-      user_id: context.userId,
-      type: "PEI",
-      student_name: student.name,
-      content: pei,
-      created_at: new Date().toISOString(),
+      organization_id: context.organizationId,
+      user_id:         context.userId,
+      type:            "PEI",
+      student_name:    student.name,
+      content:         pei,
+      created_at:      new Date().toISOString(),
     }).catch((e) => logger.error(e.message));
+
+    // Salva snapshot do aluno no histórico longitudinal
+    if (student.id && context.organizationId) {
+      const objectives = pei.sections
+        ?.find((s) => s.name?.toLowerCase().includes("objetivo"))
+        ?.content;
+      const strategies = pei.sections
+        ?.find((s) => s.name?.toLowerCase().includes("estratégia"))
+        ?.content;
+
+      saveStudentSnapshot({
+        studentId: student.id,
+        orgId: context.organizationId,
+        userId: context.userId,
+        student: { name: student.name, age: student.age, grade: student.grade, diagnosis: student.diagnosis },
+        objectives: objectives ? [{ semester_objective: objectives, achieved: null }] : [],
+        strategies: strategies ? [{ semester_strategy: strategies, effective: null }] : [],
+      }).catch((e) => logger.error("pei.snapshot.error", { error: e.message }));
+    }
 
     return {
       ...pei,
@@ -169,6 +203,7 @@ Integre as seções em um PEI completo e coeso.`,
         generatedIn: `${(elapsed / 1000).toFixed(1)}s`,
         subagents: 4,
         pattern: "fork-join",
+        historyUsed: studentHistory.length > 0,
       },
     };
   }

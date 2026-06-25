@@ -1,6 +1,15 @@
+import { timingSafeEqual } from "crypto";
 import { getSnapshot } from "../observability/metrics.js";
 import { supabase }    from "../services/dbService.js";
 import { requireRole } from "../tenant/tenantHook.js";
+
+const escapeHtml = (s) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 /**
  * DASHBOARD ROUTES
@@ -82,15 +91,15 @@ export function registerDashboardRoutes(app) {
       workflowCounts[t.workflow] = (workflowCounts[t.workflow] ?? 0) + 1;
     }
     const workflowRows = Object.entries(workflowCounts)
-      .map(([wf, count]) => `<tr><td>${wf}</td><td>${count}</td></tr>`).join("");
+      .map(([wf, count]) => `<tr><td>${escapeHtml(wf)}</td><td>${count}</td></tr>`).join("");
 
     const recentRows = traces.slice(0, 15).map((t) => `
       <tr class="${t.error ? "err" : ""}">
         <td>${new Date(t.created_at).toLocaleTimeString("pt-BR")}</td>
-        <td>${t.workflow}</td>
-        <td>${t.duration_ms ?? "—"}ms</td>
+        <td>${escapeHtml(t.workflow)}</td>
+        <td>${Number.isFinite(t.duration_ms) ? t.duration_ms + "ms" : "—"}</td>
         <td>${t.quality_score ?? "—"}</td>
-        <td>${t.error ? "❌ " + t.error.slice(0, 40) : "✅"}</td>
+        <td>${t.error ? "&#10060; " + escapeHtml(t.error.slice(0, 40)) : "&#9989;"}</td>
       </tr>`).join("");
 
     const html = `<!DOCTYPE html>
@@ -212,8 +221,13 @@ export function registerDashboardRoutes(app) {
 
   // ── GET /admin/orgs — visão geral de todos os clientes (super-admin) ──
   app.get("/admin/orgs", async (req, reply) => {
-    const secret = req.headers["x-admin-secret"];
-    if (!secret || secret !== process.env.ADMIN_SECRET) {
+    const given  = Buffer.from(req.headers["x-admin-secret"] ?? "");
+    const stored = Buffer.from(process.env.ADMIN_SECRET ?? "");
+    const valid  =
+      given.length > 0 &&
+      given.length === stored.length &&
+      timingSafeEqual(given, stored);
+    if (!valid) {
       return reply.code(403).send({ error: "FORBIDDEN" });
     }
 

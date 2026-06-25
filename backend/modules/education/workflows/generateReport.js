@@ -37,7 +37,7 @@ const REPORT_STRUCTURES = {
  *   - type: "ANAMNESE" | "PEI" | "PAEE"
  */
 export default async function generateReport({ input, context }) {
-  const { student, type, userId } = context;
+  const { student, type, userId, organizationId } = context;
 
   if (!student?.name || !type) {
     throw new Error("MISSING_CONTEXT: student.name e type são obrigatórios");
@@ -52,6 +52,7 @@ export default async function generateReport({ input, context }) {
   const { data: lessons } = await supabase
     .from("lessons")
     .select("topic, bncc_code, content, created_at")
+    .eq("organization_id", organizationId)
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(10);
@@ -107,7 +108,7 @@ Gere o relatório completo ${type}.`,
   }
 
   // Loga uso em background
-  logUsage({ userId, tokensUsed, model: "gpt-4o-mini" }).catch((e) => logger.error(e.message));
+  logUsage({ userId, organizationId, tokensUsed, model: "gpt-4o-mini" }).catch((e) => logger.error(e.message));
 
   return report;
 }

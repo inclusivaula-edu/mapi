@@ -45,6 +45,11 @@ export function registerOrgRoutes(app) {
       return reply.code(400).send({ error: "MISSING_FIELD", required: ["userId"] });
     }
 
+    const VALID_ROLES = ["admin", "teacher", "viewer"];
+    if (!VALID_ROLES.includes(role)) {
+      return reply.code(400).send({ error: "INVALID_ROLE", allowed: VALID_ROLES });
+    }
+
     try {
       await inviteMember({
         organizationId: req.tenant.orgId,
@@ -149,13 +154,14 @@ export function registerOrgRoutes(app) {
   // ── GET /org/lessons — histórico de aulas da escola ────────
   app.get("/org/lessons", async (req, reply) => {
     const { studentId, limit = 50 } = req.query ?? {};
+    const safeLimit = Math.min(Math.max(1, Number(limit) || 50), 500);
 
     let query = supabase
       .from("lessons")
       .select("id, topic, bncc_code, student_id, user_id, created_at")
       .eq("organization_id", req.tenant.orgId)
       .order("created_at", { ascending: false })
-      .limit(Number(limit));
+      .limit(safeLimit);
 
     if (studentId) query = query.eq("student_id", studentId);
 

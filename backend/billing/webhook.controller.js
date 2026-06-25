@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { logger } from "../observability/logger.js";
 import { supabase } from "../services/dbService.js";
 
@@ -9,8 +10,32 @@ import { supabase } from "../services/dbService.js";
  *
  * Payload esperado:
  *   { type, data: { organization_id, plan, period_end } }
+ *
+ * Segurança: valida o header x-webhook-secret (HMAC-SHA256 do body)
+ * usando a variável de ambiente WEBHOOK_SECRET.
  */
 export default async function webhookController(req, reply) {
+  // ── Validação de assinatura ────────────────────────────────
+  const secret = process.env.WEBHOOK_SECRET;
+  if (secret) {
+    const receivedSig = req.headers["x-webhook-secret"] ?? "";
+    const expectedSig = createHmac("sha256", secret)
+      .update(JSON.stringify(req.body))
+      .digest("hex");
+
+    const received = Buffer.from(receivedSig);
+    const expected = Buffer.from(expectedSig);
+
+    const sigsMatch =
+      received.length === expected.length &&
+      timingSafeEqual(received, expected);
+
+    if (!sigsMatch) {
+      logger.warn("WEBHOOK: assinatura inválida rejeitada");
+      return reply.code(401).send({ error: "INVALID_SIGNATURE" });
+    }
+  }
+
   const event = req.body;
 
   try {
@@ -37,7 +62,6 @@ export default async function webhookController(req, reply) {
         updated_at:           new Date().toISOString(),
       });
 
-      // Atualiza max_members da org conforme o plano
       const { getPlan } = await import("../config/plans.js");
       const plan = getPlan(planId);
       if (plan.maxMembers !== Infinity) {

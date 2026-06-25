@@ -6,7 +6,11 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 // Instância única reutilizada em todo o projeto.
-export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export const openai = new OpenAI({
+  apiKey:     process.env.OPENAI_API_KEY,
+  timeout:    60_000,  // 60s — IA jurídica e PEI podem ser lentos
+  maxRetries: 1,
+});
 
 /**
  * Chamada genérica ao modelo de chat.

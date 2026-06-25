@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAPI — Plataforma de IA para Educação e Direito</title>
+  <title>MAPI — Plataforma de IA Multimodular</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
@@ -17,6 +17,8 @@
       --jur:       #ff8c42;
       --accent:    #7c6dfa;
       --danger:    #ff4f6b;
+      --lic:       #60a5fa;
+      --lgpd:      #c084fc;
       --r:         10px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,6 +42,8 @@
     .btn-primary:hover { filter: brightness(1.15); }
     .btn-edu { background: var(--edu); color: #0a0a0f; font-weight: 600; }
     .btn-jur { background: var(--jur); color: #0a0a0f; font-weight: 600; }
+    .btn-lic { background: var(--lic); color: #0a0a0f; font-weight: 600; }
+    .btn-lgpd { background: var(--lgpd); color: #0a0a0f; font-weight: 600; }
     .btn-sm { padding: .4rem .9rem; font-size: .78rem; }
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
@@ -78,6 +82,8 @@
     .module-card:hover { transform: translateY(-3px); }
     .module-card.edu:hover { border-color: var(--edu); }
     .module-card.jur:hover { border-color: var(--jur); }
+    .module-card.lic:hover { border-color: var(--lic); }
+    .module-card.lgpd:hover { border-color: var(--lgpd); }
     .module-icon { font-size: 2rem; margin-bottom: .75rem; }
     .module-card h3 { font-size: 1.1rem; margin-bottom: .4rem; }
     .module-card p  { font-size: .83rem; color: var(--muted); line-height: 1.5; }
@@ -85,9 +91,11 @@
            font-size: .7rem; font-weight: 600; margin-top: .75rem; }
     .tag.edu { background: #0d3320; color: var(--edu); }
     .tag.jur { background: #3d2010; color: var(--jur); }
+    .tag.lic { background: #0d2040; color: var(--lic); }
+    .tag.lgpd { background: #2d1040; color: var(--lgpd); }
 
     /* ── MÓDULO ── */
-    #view-edu, #view-jur { padding: 2rem; max-width: 860px; margin: 0 auto; }
+    #view-edu, #view-jur, #view-lic, #view-lgpd { padding: 2rem; max-width: 860px; margin: 0 auto; }
     .module-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
     .module-header h2 { font-size: 1.5rem; }
     .back-btn { background: none; border: none; color: var(--muted); cursor: pointer;
@@ -99,6 +107,8 @@
                  color: var(--muted); transition: all .15s; font-family: inherit; }
     .skill-tab.active.edu { background: var(--edu); color: #0a0a0f; border-color: var(--edu); }
     .skill-tab.active.jur { background: var(--jur); color: #0a0a0f; border-color: var(--jur); }
+    .skill-tab.active.lic { background: var(--lic); color: #0a0a0f; border-color: var(--lic); }
+    .skill-tab.active.lgpd { background: var(--lgpd); color: #0a0a0f; border-color: var(--lgpd); }
     .skill-tab:hover:not(.active) { color: var(--text); border-color: var(--muted); }
     .form-card { background: var(--surface); border: 1px solid var(--border);
                  border-radius: 14px; padding: 1.75rem; margin-bottom: 1.25rem; }
@@ -171,7 +181,7 @@
   <div id="login-panel" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 61px);padding:2rem;">
     <div class="login-card">
       <h2>Entrar no MAPI</h2>
-      <p>Plataforma de IA para educação inclusiva e documentos jurídicos</p>
+      <p>Plataforma de IA para educação, jurídico, licitações e LGPD</p>
       <div class="form-group">
         <label>E-mail</label>
         <input type="email" id="login-email" placeholder="seu@email.com">
@@ -194,7 +204,7 @@
   <div id="view-home-inner">
     <div class="hero">
       <h1>Inteligência artificial para quem<br><em>constrói o futuro</em></h1>
-      <p>Gere aulas inclusivas, PEIs, relatórios pedagógicos, contratos e pareceres jurídicos em segundos — com embasamento técnico real.</p>
+      <p>Educação inclusiva, jurídico, licitações e compliance LGPD — documentos com embasamento técnico real em segundos.</p>
     </div>
     <div class="module-grid">
       <div class="module-card edu" onclick="openModule('edu')">
@@ -208,6 +218,18 @@
         <h3>Jurídico</h3>
         <p>Contratos, pareceres, minutas de petições, resumos de legislação e assistente jurídico.</p>
         <span class="tag jur">CLT · CC · CDC · OAB</span>
+      </div>
+      <div class="module-card lic" onclick="openModule('lic')">
+        <div class="module-icon">🏛️</div>
+        <h3>Licitações</h3>
+        <p>Análise de editais, propostas técnicas, memoriais descritivos, planilhas de preço e declarações.</p>
+        <span class="tag lic">Lei 14.133 · Pregão · TCU</span>
+      </div>
+      <div class="module-card lgpd" onclick="openModule('lgpd')">
+        <div class="module-icon">🔒</div>
+        <h3>Compliance LGPD</h3>
+        <p>Diagnóstico de maturidade, política de privacidade, ROPA, DPA, RIPD e plano de adequação.</p>
+        <span class="tag lgpd">Lei 13.709 · ANPD · DPO</span>
       </div>
     </div>
   </div>
@@ -488,6 +510,306 @@
   <div id="jur-result"></div>
 </div>
 
+<!-- ── MÓDULO LICITAÇÕES ── -->
+<div class="view" id="view-lic">
+  <div class="module-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="module-icon" style="font-size:1.5rem">🏛️</div>
+    <h2>Licitações</h2>
+  </div>
+
+  <div class="skill-tabs" id="lic-tabs">
+    <button class="skill-tab active lic" onclick="setSkill('lic','parse-edital',this)">Analisar Edital</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-proposta',this)">Proposta Técnica</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-memorial',this)">Memorial</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-planilha',this)">Planilha de Preços</button>
+    <button class="skill-tab" onclick="setSkill('lic','gerar-declaracao',this)">Declarações</button>
+    <button class="skill-tab" onclick="setSkill('lic','assistente-licitacao',this)">Assistente</button>
+  </div>
+
+  <!-- Parse Edital -->
+  <div id="lic-form-parse-edital" class="form-card">
+    <div class="form-group">
+      <label>Cole o texto do edital</label>
+      <textarea id="l-edital-text" rows="8" placeholder="Cole aqui o texto do edital de licitação para análise..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('parse-edital')">Analisar Edital ✦</button>
+    </div>
+  </div>
+
+  <!-- Proposta Técnica -->
+  <div id="lic-form-gerar-proposta" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Requisitos do edital (ou cole o edital)</label>
+      <textarea id="l-proposta-edital" rows="4" placeholder="Cole os requisitos técnicos do edital..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome da empresa</label>
+        <input id="l-proposta-empresa" placeholder="Ex: TechSol Ltda">
+      </div>
+      <div class="form-group">
+        <label>Objeto da licitação</label>
+        <input id="l-proposta-objeto" placeholder="Ex: Fornecimento de equipamentos de TI">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Qualificações da empresa</label>
+      <textarea id="l-proposta-qualif" rows="2" placeholder="Experiência, certificações, equipe técnica..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-proposta')">Gerar Proposta ✦</button>
+    </div>
+  </div>
+
+  <!-- Memorial -->
+  <div id="lic-form-gerar-memorial" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Objeto / Escopo do serviço</label>
+      <textarea id="l-memorial-objeto" rows="3" placeholder="Descreva o objeto do memorial descritivo..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Modalidade</label>
+        <select id="l-memorial-modal">
+          <option value="pregao-eletronico">Pregão Eletrônico</option>
+          <option value="concorrencia">Concorrência</option>
+          <option value="tomada-precos">Tomada de Preços</option>
+          <option value="convite">Convite</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Prazo de execução</label>
+        <input id="l-memorial-prazo" placeholder="Ex: 90 dias">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-memorial')">Gerar Memorial ✦</button>
+    </div>
+  </div>
+
+  <!-- Planilha de Preços -->
+  <div id="lic-form-gerar-planilha" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Itens da licitação (um por linha: descrição | quantidade | unidade)</label>
+      <textarea id="l-planilha-itens" rows="5" placeholder="Computador Desktop i7 | 50 | unidade&#10;Monitor 24pol | 50 | unidade&#10;Instalação e configuração | 1 | serviço"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Observações (BDI, impostos, frete)</label>
+      <input id="l-planilha-obs" placeholder="Ex: BDI 25%, incluso frete e instalação">
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-planilha')">Gerar Planilha ✦</button>
+    </div>
+  </div>
+
+  <!-- Declarações -->
+  <div id="lic-form-gerar-declaracao" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo de declaração</label>
+        <select id="l-decl-tipo">
+          <option value="idoneidade">Idoneidade</option>
+          <option value="menor-aprendiz">Não emprega menor</option>
+          <option value="inexigibilidade">Inexigibilidade</option>
+          <option value="me-epp">ME/EPP</option>
+          <option value="elaboracao-independente">Elaboração Independente</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nome da empresa</label>
+        <input id="l-decl-empresa" placeholder="Ex: ABC Serviços Ltda">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>CNPJ</label>
+        <input id="l-decl-cnpj" placeholder="Ex: 12.345.678/0001-90">
+      </div>
+      <div class="form-group">
+        <label>Representante legal</label>
+        <input id="l-decl-representante" placeholder="Ex: José da Silva">
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('gerar-declaracao')">Gerar Declaração ✦</button>
+    </div>
+  </div>
+
+  <!-- Assistente Licitação -->
+  <div id="lic-form-assistente-licitacao" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Sua dúvida sobre licitações</label>
+      <textarea id="l-assistente-input" rows="4" placeholder="Ex: Qual a diferença entre pregão eletrônico e presencial na Nova Lei de Licitações?"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lic" onclick="submitLic('assistente-licitacao')">Perguntar ✦</button>
+    </div>
+  </div>
+
+  <div id="lic-result"></div>
+</div>
+
+<!-- ── MÓDULO LGPD ── -->
+<div class="view" id="view-lgpd">
+  <div class="module-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="module-icon" style="font-size:1.5rem">🔒</div>
+    <h2>Compliance LGPD</h2>
+  </div>
+
+  <div class="skill-tabs" id="lgpd-tabs">
+    <button class="skill-tab active lgpd" onclick="setSkill('lgpd','diagnostico-lgpd',this)">Diagnóstico</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','gerar-politica-privacidade',this)">Política Privacidade</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','gerar-ropa',this)">ROPA</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','gerar-dpa',this)">DPA</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','gerar-plano-adequacao',this)">Plano Adequação</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','gerar-ripd',this)">RIPD</button>
+    <button class="skill-tab" onclick="setSkill('lgpd','assistente-lgpd',this)">Assistente</button>
+  </div>
+
+  <!-- Diagnóstico LGPD -->
+  <div id="lgpd-form-diagnostico-lgpd" class="form-card">
+    <div class="form-group">
+      <label>Nome da organização</label>
+      <input id="g-diag-org" placeholder="Ex: Empresa XYZ Ltda">
+    </div>
+    <div class="form-group">
+      <label>Setor de atuação</label>
+      <select id="g-diag-setor">
+        <option value="tecnologia">Tecnologia</option>
+        <option value="saude">Saúde</option>
+        <option value="educacao">Educação</option>
+        <option value="financeiro">Financeiro</option>
+        <option value="comercio">Comércio</option>
+        <option value="industria">Indústria</option>
+        <option value="servicos">Serviços</option>
+        <option value="governo">Governo</option>
+      </select>
+    </div>
+    <div id="g-diag-questions"></div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('diagnostico-lgpd')">Iniciar Diagnóstico ✦</button>
+    </div>
+  </div>
+
+  <!-- Política de Privacidade -->
+  <div id="lgpd-form-gerar-politica-privacidade" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome da empresa</label>
+        <input id="g-pol-empresa" placeholder="Ex: TechCorp Brasil Ltda">
+      </div>
+      <div class="form-group">
+        <label>Website</label>
+        <input id="g-pol-site" placeholder="Ex: www.techcorp.com.br">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Dados pessoais coletados</label>
+      <textarea id="g-pol-dados" rows="2" placeholder="Ex: nome, e-mail, CPF, endereço, dados de navegação..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Finalidade do tratamento</label>
+      <textarea id="g-pol-finalidade" rows="2" placeholder="Ex: cadastro de clientes, marketing, análise de crédito..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('gerar-politica-privacidade')">Gerar Política ✦</button>
+    </div>
+  </div>
+
+  <!-- ROPA -->
+  <div id="lgpd-form-gerar-ropa" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Nome da organização</label>
+      <input id="g-ropa-org" placeholder="Ex: Empresa ABC">
+    </div>
+    <div class="form-group">
+      <label>Principais atividades de tratamento de dados</label>
+      <textarea id="g-ropa-atividades" rows="3" placeholder="Ex: Folha de pagamento, CRM de clientes, e-mail marketing, câmeras de segurança..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('gerar-ropa')">Gerar ROPA ✦</button>
+    </div>
+  </div>
+
+  <!-- DPA -->
+  <div id="lgpd-form-gerar-dpa" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Controlador (sua empresa)</label>
+        <input id="g-dpa-controlador" placeholder="Ex: Empresa XYZ Ltda">
+      </div>
+      <div class="form-group">
+        <label>Operador (fornecedor)</label>
+        <input id="g-dpa-operador" placeholder="Ex: CloudService Inc.">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Descrição do serviço</label>
+      <textarea id="g-dpa-servico" rows="2" placeholder="Ex: Armazenamento em nuvem e processamento de dados de clientes..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('gerar-dpa')">Gerar DPA ✦</button>
+    </div>
+  </div>
+
+  <!-- Plano de Adequação -->
+  <div id="lgpd-form-gerar-plano-adequacao" class="form-card" style="display:none">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome da organização</label>
+        <input id="g-plano-org" placeholder="Ex: Empresa ABC">
+      </div>
+      <div class="form-group">
+        <label>Porte</label>
+        <select id="g-plano-porte">
+          <option value="micro">Microempresa</option>
+          <option value="pequena">Pequena empresa</option>
+          <option value="media">Média empresa</option>
+          <option value="grande">Grande empresa</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Principais gaps identificados</label>
+      <textarea id="g-plano-gaps" rows="3" placeholder="Ex: Sem DPO nomeado, sem política de privacidade, contratos sem cláusulas LGPD..."></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('gerar-plano-adequacao')">Gerar Plano ✦</button>
+    </div>
+  </div>
+
+  <!-- RIPD -->
+  <div id="lgpd-form-gerar-ripd" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Atividade de tratamento a avaliar</label>
+      <textarea id="g-ripd-atividade" rows="3" placeholder="Ex: Implementação de sistema de reconhecimento facial para controle de acesso..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Dados pessoais envolvidos</label>
+      <input id="g-ripd-dados" placeholder="Ex: biometria facial, nome, CPF, horário de acesso">
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('gerar-ripd')">Gerar RIPD ✦</button>
+    </div>
+  </div>
+
+  <!-- Assistente LGPD -->
+  <div id="lgpd-form-assistente-lgpd" class="form-card" style="display:none">
+    <div class="form-group">
+      <label>Sua dúvida sobre LGPD</label>
+      <textarea id="g-assistente-input" rows="4" placeholder="Ex: Preciso nomear um DPO? Quais são as bases legais para tratamento de dados sensíveis?"></textarea>
+    </div>
+    <div class="submit-row">
+      <button class="btn btn-lgpd" onclick="submitLGPD('assistente-lgpd')">Perguntar ✦</button>
+    </div>
+  </div>
+
+  <div id="lgpd-result"></div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -495,6 +817,8 @@
   let token = localStorage.getItem('mapi_token') ?? '';
   let currentEduSkill = 'gerar-aula';
   let currentJurSkill = 'gerar-contrato';
+  let currentLicSkill = 'parse-edital';
+  let currentLgpdSkill = 'diagnostico-lgpd';
 
   // ── AUTH ───────────────────────────────────────────────────
   async function doLogin() {
@@ -568,14 +892,16 @@
 
   // ── SKILL TABS ─────────────────────────────────────────────
   function setSkill(mod, skill, btn) {
-    const prefix = mod === 'edu' ? 'edu' : 'jur';
-    document.querySelectorAll(`#${prefix}-tabs .skill-tab`).forEach(t => t.classList.remove('active', 'edu', 'jur'));
+    const prefix = mod;
+    document.querySelectorAll(`#${prefix}-tabs .skill-tab`).forEach(t => t.classList.remove('active', 'edu', 'jur', 'lic', 'lgpd'));
     btn.classList.add('active', mod);
     document.querySelectorAll(`[id^="${prefix}-form-"]`).forEach(f => f.style.display = 'none');
     const form = document.getElementById(`${prefix}-form-${skill}`);
     if (form) form.style.display = 'block';
-    if (mod === 'edu') { currentEduSkill = skill; document.getElementById('edu-result').innerHTML = ''; }
-    else               { currentJurSkill = skill; document.getElementById('jur-result').innerHTML = ''; }
+    if (mod === 'edu')  { currentEduSkill = skill; document.getElementById('edu-result').innerHTML = ''; }
+    if (mod === 'jur')  { currentJurSkill = skill; document.getElementById('jur-result').innerHTML = ''; }
+    if (mod === 'lic')  { currentLicSkill = skill; document.getElementById('lic-result').innerHTML = ''; }
+    if (mod === 'lgpd') { currentLgpdSkill = skill; document.getElementById('lgpd-result').innerHTML = ''; }
   }
 
   // ── EDUCATION ──────────────────────────────────────────────
@@ -773,6 +1099,182 @@
           ${r._meta.subagents ? `<span class="meta-item">Subagentes: <strong>${r._meta.subagents}</strong></span>` : ''}
         </div>` : ''}
         <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Este documento foi gerado por IA. Revise com advogado habilitado antes de usar.'}</div>
+      </div></div>`;
+    toast('Documento gerado', 'ok');
+  }
+
+  // ── LICITAÇÕES ─────────────────────────────────────────────
+  async function submitLic(skill) {
+    const resultEl = document.getElementById('lic-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Consultando legislação e gerando documento...</div>';
+
+    let body = { skill };
+
+    if (skill === 'parse-edital') {
+      body.editalText = document.getElementById('l-edital-text').value.trim();
+      if (!body.editalText) { toast('Cole o texto do edital', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-proposta') {
+      body.editalText = document.getElementById('l-proposta-edital').value.trim();
+      body.empresa = document.getElementById('l-proposta-empresa').value.trim();
+      body.objeto = document.getElementById('l-proposta-objeto').value.trim();
+      body.qualificacoes = document.getElementById('l-proposta-qualif').value.trim();
+      if (!body.editalText) { toast('Cole os requisitos do edital', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-memorial') {
+      body.objeto = document.getElementById('l-memorial-objeto').value.trim();
+      body.modalidade = document.getElementById('l-memorial-modal').value;
+      body.prazo = document.getElementById('l-memorial-prazo').value.trim();
+      if (!body.objeto) { toast('Descreva o objeto', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-planilha') {
+      body.itens = document.getElementById('l-planilha-itens').value.trim();
+      body.observacoes = document.getElementById('l-planilha-obs').value.trim();
+      if (!body.itens) { toast('Informe os itens', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-declaracao') {
+      body.tipo = document.getElementById('l-decl-tipo').value;
+      body.empresa = document.getElementById('l-decl-empresa').value.trim();
+      body.cnpj = document.getElementById('l-decl-cnpj').value.trim();
+      body.representante = document.getElementById('l-decl-representante').value.trim();
+      if (!body.empresa) { toast('Informe o nome da empresa', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'assistente-licitacao') {
+      body.input = document.getElementById('l-assistente-input').value.trim();
+      if (!body.input) { toast('Digite sua dúvida', 'err'); resultEl.innerHTML = ''; return; }
+    }
+
+    try {
+      const res = await apiFetch('/ai/licitacao', body);
+      renderLicResult(res, skill, resultEl);
+    } catch (err) {
+      resultEl.innerHTML = `<div class="result-card"><p style="color:var(--danger)">${err.message}</p></div>`;
+    }
+  }
+
+  function renderLicResult(data, skill, el) {
+    const r = data.response ?? data;
+    if (!r) { el.innerHTML = '<div class="result-card"><p>Sem resultado.</p></div>'; return; }
+
+    if (skill === 'assistente-licitacao') {
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>🏛️ Assistente de Licitações</h3></div>
+        <div class="result-body">
+          <p>${(r.content ?? r).replace(/\n/g,'<br>')}</p>
+          <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Esta resposta é informativa. Consulte um especialista em licitações.'}</div>
+        </div></div>`; return;
+    }
+
+    const secoes = r.secoes ?? r.sections ?? r.clausulas ?? [];
+    const sHtml = secoes.map(s => `<h4>${s.titulo ?? s.name ?? ''}</h4><p>${(s.conteudo ?? s.content ?? '').replace(/\n/g,'<br>')}</p>`).join('');
+    const legHtml = (r.legislacao_aplicada ?? []).map(l =>
+      `<li>${l.lei}${l.artigo ? ' — ' + l.artigo : ''}: ${l.ementa ?? ''}</li>`).join('');
+
+    el.innerHTML = `<div class="result-card">
+      <div class="result-header"><h3>📄 ${r.titulo ?? skill}</h3></div>
+      <div class="result-body">
+        ${sHtml || `<p>${JSON.stringify(r, null, 2)}</p>`}
+        ${legHtml ? `<h4>Legislação Aplicada</h4><ul>${legHtml}</ul>` : ''}
+        <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Documento gerado por IA — revise antes de submeter ao órgão licitante.'}</div>
+      </div></div>`;
+    toast('Documento gerado', 'ok');
+  }
+
+  // ── LGPD ──────────────────────────────────────────────────
+  async function submitLGPD(skill) {
+    const resultEl = document.getElementById('lgpd-result');
+    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Analisando conformidade LGPD...</div>';
+
+    let body = { skill };
+
+    if (skill === 'diagnostico-lgpd') {
+      body.organizacao = document.getElementById('g-diag-org').value.trim();
+      body.setor = document.getElementById('g-diag-setor').value;
+      if (!body.organizacao) { toast('Informe o nome da organização', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-politica-privacidade') {
+      body.empresa = document.getElementById('g-pol-empresa').value.trim();
+      body.website = document.getElementById('g-pol-site').value.trim();
+      body.dadosColetados = document.getElementById('g-pol-dados').value.trim();
+      body.finalidade = document.getElementById('g-pol-finalidade').value.trim();
+      if (!body.empresa) { toast('Informe o nome da empresa', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-ropa') {
+      body.organizacao = document.getElementById('g-ropa-org').value.trim();
+      body.atividades = document.getElementById('g-ropa-atividades').value.trim();
+      if (!body.organizacao) { toast('Informe o nome da organização', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-dpa') {
+      body.controlador = document.getElementById('g-dpa-controlador').value.trim();
+      body.operador = document.getElementById('g-dpa-operador').value.trim();
+      body.servico = document.getElementById('g-dpa-servico').value.trim();
+      if (!body.controlador || !body.operador) { toast('Informe controlador e operador', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-plano-adequacao') {
+      body.organizacao = document.getElementById('g-plano-org').value.trim();
+      body.porte = document.getElementById('g-plano-porte').value;
+      body.gaps = document.getElementById('g-plano-gaps').value.trim();
+      if (!body.organizacao) { toast('Informe o nome da organização', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'gerar-ripd') {
+      body.atividade = document.getElementById('g-ripd-atividade').value.trim();
+      body.dados = document.getElementById('g-ripd-dados').value.trim();
+      if (!body.atividade) { toast('Descreva a atividade', 'err'); resultEl.innerHTML = ''; return; }
+    } else if (skill === 'assistente-lgpd') {
+      body.input = document.getElementById('g-assistente-input').value.trim();
+      if (!body.input) { toast('Digite sua dúvida', 'err'); resultEl.innerHTML = ''; return; }
+    }
+
+    try {
+      const res = await apiFetch('/ai/lgpd', body);
+      renderLGPDResult(res, skill, resultEl);
+    } catch (err) {
+      resultEl.innerHTML = `<div class="result-card"><p style="color:var(--danger)">${err.message}</p></div>`;
+    }
+  }
+
+  function renderLGPDResult(data, skill, el) {
+    const r = data.response ?? data;
+    if (!r) { el.innerHTML = '<div class="result-card"><p>Sem resultado.</p></div>'; return; }
+
+    if (skill === 'assistente-lgpd') {
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>🔒 Assistente LGPD</h3></div>
+        <div class="result-body">
+          <p>${(r.content ?? r).replace(/\n/g,'<br>')}</p>
+          <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Esta resposta é informativa. Consulte um DPO ou advogado especializado em LGPD.'}</div>
+        </div></div>`; return;
+    }
+
+    if (skill === 'diagnostico-lgpd' && r.questionario) {
+      let qHtml = '<h4>Responda o questionário abaixo:</h4>';
+      r.questionario.forEach((q, i) => {
+        qHtml += `<div class="form-group"><label>${q.dimensao}: ${q.pergunta}</label>
+          <select id="g-diag-q-${i}"><option value="0">0 — Inexistente</option>
+          <option value="2">2 — Inicial</option><option value="4">4 — Básico</option>
+          <option value="6">6 — Intermediário</option><option value="8">8 — Avançado</option>
+          <option value="10">10 — Otimizado</option></select></div>`;
+      });
+      document.getElementById('g-diag-questions').innerHTML = qHtml;
+      el.innerHTML = '<div class="result-card"><div class="result-body"><p>Questionário carregado acima. Preencha e clique em "Iniciar Diagnóstico" novamente.</p></div></div>';
+      return;
+    }
+
+    if (skill === 'diagnostico-lgpd' && r.score != null) {
+      const lvl = r.nivel ?? r.level ?? '';
+      const badge = `<span class="score-badge ${r.score >= 7 ? 'score-high' : r.score >= 4 ? 'score-mid' : 'score-low'}">Score ${r.score}/10 — ${lvl}</span>`;
+      const dims = (r.dimensoes ?? []).map(d => `<li><strong>${d.nome}</strong>: ${d.score}/10 — ${d.status ?? ''}</li>`).join('');
+      el.innerHTML = `<div class="result-card">
+        <div class="result-header"><h3>📊 Diagnóstico LGPD</h3><div class="result-actions">${badge}</div></div>
+        <div class="result-body">
+          ${dims ? `<h4>Dimensões</h4><ul>${dims}</ul>` : ''}
+          ${r.recomendacoes ? `<h4>Recomendações</h4><p>${(Array.isArray(r.recomendacoes) ? r.recomendacoes.join('<br>') : r.recomendacoes)}</p>` : ''}
+          ${r.analise ? `<h4>Análise</h4><p>${r.analise.replace(/\n/g,'<br>')}</p>` : ''}
+        </div></div>`;
+      toast('Diagnóstico concluído', 'ok'); return;
+    }
+
+    const secoes = r.secoes ?? r.sections ?? r.clausulas ?? [];
+    const sHtml = secoes.map(s => `<h4>${s.titulo ?? s.name ?? ''}</h4><p>${(s.conteudo ?? s.content ?? '').replace(/\n/g,'<br>')}</p>`).join('');
+    const legHtml = (r.legislacao_aplicada ?? []).map(l =>
+      `<li>${l.lei}${l.artigo ? ' — ' + l.artigo : ''}: ${l.ementa ?? ''}</li>`).join('');
+
+    el.innerHTML = `<div class="result-card">
+      <div class="result-header"><h3>📄 ${r.titulo ?? skill}</h3></div>
+      <div class="result-body">
+        ${sHtml || `<p>${JSON.stringify(r, null, 2)}</p>`}
+        ${legHtml ? `<h4>Legislação Aplicada</h4><ul>${legHtml}</ul>` : ''}
+        <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Documento gerado por IA — deve ser revisado por DPO ou advogado especializado.'}</div>
       </div></div>`;
     toast('Documento gerado', 'ok');
   }
