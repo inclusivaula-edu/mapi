@@ -150,7 +150,7 @@ app.post("/auth/login", {
     if (!email || !password) {
       return reply.code(400).send({ error: "MISSING_CREDENTIALS" });
     }
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseAuth.auth.signInWithPassword({ email, password });
     if (error || !data?.session) {
       return reply.code(401).send({ error: "INVALID_CREDENTIALS" });
     }
