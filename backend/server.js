@@ -540,6 +540,59 @@ app.post("/api/bid-projects", { preHandler: billingGuard }, async (req, reply) =
   return reply.code(201).send({ project: data });
 });
 
+// ── EMPRESA: Perfil e Certidões ─────────────────────────────
+import { getCompanyProfile, saveCompanyProfile, getCompanyCertidoes, saveCertidao } from "./skills/licitacoes/companyProfile.js";
+import { getBidHistory, saveBidHistory, getBidStats } from "./skills/licitacoes/bidHistory.js";
+
+app.get("/api/company-profile", async (req, reply) => {
+  const profile = await getCompanyProfile(req.tenant.orgId);
+  if (!profile) return reply.code(404).send({ error: "PROFILE_NOT_FOUND" });
+  return reply.send({ profile });
+});
+
+app.post("/api/company-profile", async (req, reply) => {
+  try {
+    const profile = await saveCompanyProfile(req.tenant.orgId, req.user.id, req.body ?? {});
+    return reply.send({ profile });
+  } catch (err) {
+    return reply.code(500).send({ error: err.message });
+  }
+});
+
+app.get("/api/company-certidoes", async (req, reply) => {
+  const certidoes = await getCompanyCertidoes(req.tenant.orgId);
+  return reply.send({ certidoes });
+});
+
+app.post("/api/company-certidoes", async (req, reply) => {
+  try {
+    const certidao = await saveCertidao(req.tenant.orgId, req.body ?? {});
+    return reply.send({ certidao });
+  } catch (err) {
+    return reply.code(500).send({ error: err.message });
+  }
+});
+
+// ── LICITAÇÕES: Histórico ───────────────────────────────────
+app.get("/api/bid-history", async (req, reply) => {
+  const history = await getBidHistory(req.tenant.orgId, { limit: 50 });
+  return reply.send({ history });
+});
+
+app.post("/api/bid-history", async (req, reply) => {
+  try {
+    const entry = await saveBidHistory(req.tenant.orgId, req.user.id, req.body ?? {});
+    return reply.send({ entry });
+  } catch (err) {
+    return reply.code(500).send({ error: err.message });
+  }
+});
+
+app.get("/api/bid-stats", async (req, reply) => {
+  const stats = await getBidStats(req.tenant.orgId);
+  return reply.send({ stats });
+});
+
 // ── AI: LGPD ────────────────────────────────────────────────
 app.post("/ai/lgpd", { preHandler: billingGuard }, async (req, reply) => {
   try {

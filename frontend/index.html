@@ -530,6 +530,8 @@
     <button class="skill-tab" onclick="setSkill('lic','gerar-arp',this)">ARP</button>
     <button class="skill-tab" onclick="setSkill('lic','gerar-minuta-contrato',this)">Minuta Contrato</button>
     <button class="skill-tab" onclick="setSkill('lic','assistente-licitacao',this)">Assistente</button>
+    <button class="skill-tab" onclick="setSkill('lic','minha-empresa',this)">Minha Empresa</button>
+    <button class="skill-tab" onclick="setSkill('lic','historico-licitacoes',this)">Histórico</button>
   </div>
 
   <!-- Parse Edital -->
@@ -825,6 +827,190 @@
     <div class="submit-row">
       <button class="btn btn-lic" onclick="submitLic('gerar-minuta-contrato')">Gerar Minuta ✦</button>
     </div>
+  </div>
+
+  <!-- Minha Empresa -->
+  <div id="lic-form-minha-empresa" class="form-card" style="display:none">
+    <h3 style="margin-bottom:1rem;font-family:'Syne',sans-serif;font-size:1rem">Perfil da Empresa</h3>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">Dados preenchidos automaticamente em todos os documentos de licitação.</p>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Razão Social *</label>
+        <input id="cp-razao" placeholder="Ex: TechSol Informática Ltda">
+      </div>
+      <div class="form-group">
+        <label>Nome Fantasia</label>
+        <input id="cp-fantasia" placeholder="Ex: TechSol">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>CNPJ *</label>
+        <input id="cp-cnpj" placeholder="Ex: 12.345.678/0001-90">
+      </div>
+      <div class="form-group">
+        <label>Porte</label>
+        <select id="cp-porte">
+          <option value="geral">Geral</option>
+          <option value="mei">MEI</option>
+          <option value="me">Microempresa (ME)</option>
+          <option value="epp">EPP</option>
+          <option value="medio">Média empresa</option>
+          <option value="grande">Grande empresa</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>CNAE Principal</label>
+        <input id="cp-cnae" placeholder="Ex: 6201-5/01">
+      </div>
+      <div class="form-group">
+        <label>Ramo de Atividade</label>
+        <input id="cp-ramo" placeholder="Ex: Desenvolvimento de software">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Endereço completo</label>
+      <input id="cp-endereco" placeholder="Ex: Rua das Flores, 123 — Sala 45">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cidade</label>
+        <input id="cp-cidade" placeholder="Ex: Brasília">
+      </div>
+      <div class="form-group">
+        <label>UF</label>
+        <select id="cp-uf">
+          <option value="">Selecione</option>
+          <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+          <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+          <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+          <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+          <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+          <option>SE</option><option>TO</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>CEP</label>
+        <input id="cp-cep" placeholder="Ex: 70000-000">
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input id="cp-telefone" placeholder="Ex: (61) 99999-0000">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>E-mail corporativo</label>
+        <input id="cp-email" placeholder="Ex: licitacao@techsol.com.br">
+      </div>
+      <div class="form-group">
+        <label>Website</label>
+        <input id="cp-website" placeholder="Ex: www.techsol.com.br">
+      </div>
+    </div>
+    <h3 style="margin:1.5rem 0 .75rem;font-family:'Syne',sans-serif;font-size:.95rem">Representante Legal</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input id="cp-rep-nome" placeholder="Ex: José da Silva">
+      </div>
+      <div class="form-group">
+        <label>Cargo</label>
+        <input id="cp-rep-cargo" placeholder="Ex: Sócio-administrador">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>CPF</label>
+        <input id="cp-rep-cpf" placeholder="Ex: 123.456.789-00">
+      </div>
+      <div class="form-group">
+        <label>RG</label>
+        <input id="cp-rep-rg" placeholder="Ex: 1234567 SSP/DF">
+      </div>
+    </div>
+    <h3 style="margin:1.5rem 0 .75rem;font-family:'Syne',sans-serif;font-size:.95rem">Dados Bancários</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Banco</label>
+        <input id="cp-banco" placeholder="Ex: Banco do Brasil">
+      </div>
+      <div class="form-group">
+        <label>Agência</label>
+        <input id="cp-agencia" placeholder="Ex: 1234-5">
+      </div>
+    </div>
+    <div class="form-group" style="max-width:calc(50% - .5rem)">
+      <label>Conta Corrente</label>
+      <input id="cp-conta" placeholder="Ex: 12345-6">
+    </div>
+    <div class="submit-row" style="gap:.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="loadCompanyProfile()">Carregar dados salvos</button>
+      <button class="btn btn-lic" onclick="saveCompanyProfileForm()">Salvar Perfil ✦</button>
+    </div>
+  </div>
+
+  <!-- Histórico de Licitações -->
+  <div id="lic-form-historico-licitacoes" class="form-card" style="display:none">
+    <h3 style="margin-bottom:1rem;font-family:'Syne',sans-serif;font-size:1rem">Registrar Participação</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nº do Edital</label>
+        <input id="bh-edital" placeholder="Ex: PE 023/2026">
+      </div>
+      <div class="form-group">
+        <label>Órgão Licitante</label>
+        <input id="bh-orgao" placeholder="Ex: Ministério da Educação">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Objeto</label>
+      <input id="bh-objeto" placeholder="Ex: Aquisição de equipamentos de TI">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Modalidade</label>
+        <select id="bh-modalidade">
+          <option value="Pregão Eletrônico">Pregão Eletrônico</option>
+          <option value="Concorrência">Concorrência</option>
+          <option value="Dispensa">Dispensa</option>
+          <option value="Inexigibilidade">Inexigibilidade</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Resultado</label>
+        <select id="bh-resultado">
+          <option value="em_andamento">Em andamento</option>
+          <option value="vencida">Vencida</option>
+          <option value="perdida">Perdida</option>
+          <option value="desclassificada">Desclassificada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor da proposta (R$)</label>
+        <input id="bh-valor-proposta" placeholder="Ex: 250000.00">
+      </div>
+      <div class="form-group">
+        <label>Valor do contrato (R$)</label>
+        <input id="bh-valor-contrato" placeholder="Ex: 245000.00">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observações</label>
+      <textarea id="bh-notas" rows="2" placeholder="Lições aprendidas, motivo de perda, etc."></textarea>
+    </div>
+    <div class="submit-row" style="gap:.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="loadBidHistory()">Ver histórico</button>
+      <button class="btn btn-lic" onclick="saveBidHistoryForm()">Registrar ✦</button>
+    </div>
+    <div id="bid-history-list" style="margin-top:1rem"></div>
   </div>
 
   <div id="lic-result"></div>
@@ -1526,6 +1712,115 @@
         <div class="disclaimer">⚠️ ${r.disclaimer ?? 'Documento gerado por IA — deve ser revisado por DPO ou advogado especializado.'}</div>
       </div></div>`;
     toast('Documento gerado', 'ok');
+  }
+
+  // ── EMPRESA PROFILE ────────────────────────────────────────
+  async function loadCompanyProfile() {
+    try {
+      const res = await apiFetch('/api/company-profile', null, 'GET');
+      const p = res.profile;
+      if (!p) { toast('Nenhum perfil salvo ainda', 'err'); return; }
+      document.getElementById('cp-razao').value = p.razao_social ?? '';
+      document.getElementById('cp-fantasia').value = p.nome_fantasia ?? '';
+      document.getElementById('cp-cnpj').value = p.cnpj ?? '';
+      document.getElementById('cp-porte').value = p.porte ?? 'geral';
+      document.getElementById('cp-cnae').value = p.cnae_principal ?? '';
+      document.getElementById('cp-ramo').value = p.ramo_atividade ?? '';
+      document.getElementById('cp-endereco').value = p.endereco ?? '';
+      document.getElementById('cp-cidade').value = p.cidade ?? '';
+      document.getElementById('cp-uf').value = p.uf ?? '';
+      document.getElementById('cp-cep').value = p.cep ?? '';
+      document.getElementById('cp-telefone').value = p.telefone ?? '';
+      document.getElementById('cp-email').value = p.email ?? '';
+      document.getElementById('cp-website').value = p.website ?? '';
+      document.getElementById('cp-rep-nome').value = p.representante_nome ?? '';
+      document.getElementById('cp-rep-cargo').value = p.representante_cargo ?? '';
+      document.getElementById('cp-rep-cpf').value = p.representante_cpf ?? '';
+      document.getElementById('cp-rep-rg').value = p.representante_rg ?? '';
+      document.getElementById('cp-banco').value = p.banco ?? '';
+      document.getElementById('cp-agencia').value = p.agencia ?? '';
+      document.getElementById('cp-conta').value = p.conta ?? '';
+      toast('Perfil carregado', 'ok');
+    } catch { toast('Perfil não encontrado', 'err'); }
+  }
+
+  async function saveCompanyProfileForm() {
+    const razao = document.getElementById('cp-razao').value.trim();
+    const cnpj = document.getElementById('cp-cnpj').value.trim();
+    if (!razao || !cnpj) { toast('Razão social e CNPJ são obrigatórios', 'err'); return; }
+    try {
+      await apiFetch('/api/company-profile', {
+        razao_social: razao,
+        nome_fantasia: document.getElementById('cp-fantasia').value.trim(),
+        cnpj,
+        porte: document.getElementById('cp-porte').value,
+        cnae_principal: document.getElementById('cp-cnae').value.trim(),
+        ramo_atividade: document.getElementById('cp-ramo').value.trim(),
+        endereco: document.getElementById('cp-endereco').value.trim(),
+        cidade: document.getElementById('cp-cidade').value.trim(),
+        uf: document.getElementById('cp-uf').value,
+        cep: document.getElementById('cp-cep').value.trim(),
+        telefone: document.getElementById('cp-telefone').value.trim(),
+        email: document.getElementById('cp-email').value.trim(),
+        website: document.getElementById('cp-website').value.trim(),
+        representante_nome: document.getElementById('cp-rep-nome').value.trim(),
+        representante_cargo: document.getElementById('cp-rep-cargo').value.trim(),
+        representante_cpf: document.getElementById('cp-rep-cpf').value.trim(),
+        representante_rg: document.getElementById('cp-rep-rg').value.trim(),
+        banco: document.getElementById('cp-banco').value.trim(),
+        agencia: document.getElementById('cp-agencia').value.trim(),
+        conta: document.getElementById('cp-conta').value.trim(),
+      });
+      toast('Perfil salvo com sucesso', 'ok');
+    } catch (err) { toast('Erro ao salvar: ' + err.message, 'err'); }
+  }
+
+  // ── BID HISTORY ───────────────────────────────────────────
+  async function loadBidHistory() {
+    const listEl = document.getElementById('bid-history-list');
+    listEl.innerHTML = '<div class="loading"><div class="spinner"></div> Carregando...</div>';
+    try {
+      const [histRes, statsRes] = await Promise.all([
+        apiFetch('/api/bid-history', null, 'GET'),
+        apiFetch('/api/bid-stats', null, 'GET'),
+      ]);
+      const stats = statsRes.stats;
+      const history = histRes.history ?? [];
+      const colors = { vencida: 'var(--edu)', perdida: 'var(--danger)', em_andamento: 'var(--lic)', desclassificada: 'var(--muted)', cancelada: 'var(--muted)' };
+      const statsHtml = stats ? `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+        <span class="meta-item">Total: <strong>${stats.total}</strong></span>
+        <span class="meta-item">Vencidas: <strong style="color:var(--edu)">${stats.vencidas}</strong></span>
+        <span class="meta-item">Perdidas: <strong style="color:var(--danger)">${stats.perdidas}</strong></span>
+        <span class="meta-item">Taxa: <strong>${stats.taxa_sucesso}%</strong></span>
+        <span class="meta-item">Valor total: <strong>R$ ${(stats.valor_total_vencido ?? 0).toLocaleString('pt-BR')}</strong></span>
+      </div>` : '';
+      const rows = history.map(h => `<div style="padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.83rem">
+        <strong>${h.objeto}</strong><br>
+        <span style="color:var(--muted)">${h.numero_edital ?? '—'} | ${h.orgao_licitante ?? '—'} | ${h.modalidade ?? '—'}</span><br>
+        <span style="color:${colors[h.resultado] ?? 'var(--muted)'}">${h.resultado}</span>
+        ${h.valor_proposta ? ` | R$ ${Number(h.valor_proposta).toLocaleString('pt-BR')}` : ''}
+      </div>`).join('');
+      listEl.innerHTML = `${statsHtml}${rows || '<p style="color:var(--muted)">Nenhum registro encontrado.</p>'}`;
+    } catch { listEl.innerHTML = '<p style="color:var(--muted)">Nenhum histórico ainda.</p>'; }
+  }
+
+  async function saveBidHistoryForm() {
+    const objeto = document.getElementById('bh-objeto').value.trim();
+    if (!objeto) { toast('Objeto é obrigatório', 'err'); return; }
+    try {
+      await apiFetch('/api/bid-history', {
+        numeroEdital: document.getElementById('bh-edital').value.trim(),
+        orgaoLicitante: document.getElementById('bh-orgao').value.trim(),
+        objeto,
+        modalidade: document.getElementById('bh-modalidade').value,
+        resultado: document.getElementById('bh-resultado').value,
+        valorProposta: parseFloat(document.getElementById('bh-valor-proposta').value) || null,
+        valorContrato: parseFloat(document.getElementById('bh-valor-contrato').value) || null,
+        notas: document.getElementById('bh-notas').value.trim(),
+      });
+      toast('Participação registrada', 'ok');
+      loadBidHistory();
+    } catch (err) { toast('Erro: ' + err.message, 'err'); }
   }
 
   // ── API FETCH ──────────────────────────────────────────────

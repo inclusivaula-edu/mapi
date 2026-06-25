@@ -5,6 +5,8 @@ import { parseEdital }               from "../../skills/licitacoes/parseEditalSk
 import { validateETP }               from "../../skills/licitacoes/validateETP.js";
 import { validateTR }                from "../../skills/licitacoes/validateTR.js";
 import { checklistSICAF }            from "../../skills/licitacoes/checklistSICAF.js";
+import { getCompanyProfile, injectCompanyContext } from "../../skills/licitacoes/companyProfile.js";
+import { getBidHistory, getBidStats, injectHistoryContext } from "../../skills/licitacoes/bidHistory.js";
 import { startTrace }                from "../../observability/tracer.js";
 import { recordRequest, recordError, recordLatency, recordTokens } from "../../observability/metrics.js";
 import { logger }                    from "../../observability/logger.js";
@@ -179,9 +181,22 @@ FORMATO DE SAÍDA FINAL (JSON puro, sem markdown):
     recordRequest(`licitacao:${tipo}`);
 
     try {
-      const userContent = editalText
-        ? `Tipo de documento: ${tipo}\nDescrição: ${descricao}\n\nTEXTO DO EDITAL:\n${editalText.slice(0, 12000)}\n\nSiga o processo obrigatório.`
-        : `Tipo de documento: ${tipo}\nDescrição: ${descricao}\nID da organização: ${context.organizationId}\n\nSiga o processo obrigatório.`;
+      const [companyProfile, bidStats, recentHistory] = await Promise.all([
+        getCompanyProfile(context.organizationId).catch(() => null),
+        getBidStats(context.organizationId).catch(() => null),
+        getBidHistory(context.organizationId, { limit: 5 }).catch(() => []),
+      ]);
+
+      const companyCtx = injectCompanyContext(companyProfile);
+      const historyCtx = injectHistoryContext(bidStats, recentHistory);
+
+      let userContent = editalText
+        ? `Tipo de documento: ${tipo}\nDescrição: ${descricao}\n\nTEXTO DO EDITAL:\n${editalText.slice(0, 12000)}`
+        : `Tipo de documento: ${tipo}\nDescrição: ${descricao}`;
+
+      if (companyCtx) userContent += `\n\n${companyCtx}`;
+      if (historyCtx) userContent += `\n\n${historyCtx}`;
+      userContent += "\n\nSiga o processo obrigatório.";
 
       const messages = [
         { role: "system", content: this.identity(tipo) },
